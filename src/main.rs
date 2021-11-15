@@ -1,6 +1,8 @@
 mod scanner;
+mod parser;
 
 use scanner::Scanner;
+use parser::Parser;
 
 fn main() {
     let input = r#"
@@ -25,4 +27,9 @@ fn main() {
     for t in scanner.scan_tokens() {
         println!("{:?}", t);
     }
+
+    let mut parser = Parser::new(scanner.tokens);
+    let json = parser.parse();
+
+    println!("{:?}", json);
 }
