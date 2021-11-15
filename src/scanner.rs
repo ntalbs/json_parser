@@ -28,8 +28,8 @@ pub struct Error {
 
 pub struct Scanner {
     source: String,
-    tokens: Vec<Token>,
-    errors: Vec<Error>,
+    pub tokens: Vec<Token>,
+    pub errors: Vec<Error>,
     start: usize,
     current: usize,
     line: usize,
