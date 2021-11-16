@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::string::String;
 
-use crate::scanner::{Token, TokenType};
-use crate::scanner::TokenType::*;
+use crate::scanner::Token;
+use crate::scanner::Token::*;
 
 #[derive(Debug)]
 pub enum Json {
@@ -33,8 +33,7 @@ impl Parser {
 
     fn json(&mut self) -> Json {
         let token = self.peek();
-        let token_type = &token.token_type;
-        match token_type {
+        match token {
             LeftBrace => self.obj(),
             LeftBracket => self.arr(),
             String(s) => self.str(s.to_string()),
@@ -97,7 +96,7 @@ impl Parser {
     }
 
     fn key(&mut self) -> String {
-        match &self.advance().token_type {
+        match &self.advance() {
             String(s) => s.to_string(),
             _ => panic!("Invalid token: expected string"),
         }
@@ -130,15 +129,15 @@ impl Parser {
         self.previous()
     }
 
-    fn check(&self, token_type: TokenType) -> bool {
+    fn check(&self, token: Token) -> bool {
         if self.is_at_end() {
             return false;
         }
-        self.peek().token_type == token_type
+        *self.peek() == token
     }
 
     fn is_at_end(&self) -> bool {
-        self.peek().token_type == TokenType::EOF
+        *self.peek() == Token::EOF
     }
 
     fn peek(&self) -> &Token {
@@ -149,8 +148,8 @@ impl Parser {
         &self.tokens[self.current - 1]
     }
 
-    fn consume(&mut self, token_type: TokenType, message: String) -> &Token {
-        if self.check(token_type) {
+    fn consume(&mut self, token: Token, message: String) -> &Token {
+        if self.check(token) {
             return self.advance();
         }
         panic!("{}", message);

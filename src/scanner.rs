@@ -1,5 +1,5 @@
 #[derive(Debug, PartialEq)]
-pub enum TokenType {
+pub enum Token {
     LeftBrace,
     RightBrace,
     LeftBracket,
@@ -11,12 +11,6 @@ pub enum TokenType {
     Bool(bool),
     Null,
     EOF,
-}
-
-#[derive(Debug)]
-pub struct Token {
-    pub token_type: TokenType,
-    pub lexeme: String,
 }
 
 #[derive(Debug)]
@@ -54,7 +48,7 @@ impl Scanner {
             self.start = self.current;
             self.scan_token();
         }
-        self.add_token(TokenType::EOF);
+        self.add_token(Token::EOF);
 
         if self.errors.len() > 0 {
             Err(&self.errors)
@@ -66,12 +60,12 @@ impl Scanner {
     fn scan_token(&mut self) {
         let c = self.advance();
         match c {
-            '{' => self.add_token(TokenType::LeftBrace),
-            '}' => self.add_token(TokenType::RightBrace),
-            '[' => self.add_token(TokenType::LeftBracket),
-            ']' => self.add_token(TokenType::RightBracket),
-            ':' => self.add_token(TokenType::Colon),
-            ',' => self.add_token(TokenType::Comma),
+            '{' => self.add_token(Token::LeftBrace),
+            '}' => self.add_token(Token::RightBrace),
+            '[' => self.add_token(Token::LeftBracket),
+            ']' => self.add_token(Token::RightBracket),
+            ':' => self.add_token(Token::Colon),
+            ',' => self.add_token(Token::Comma),
             ' '|'\t'|'\r' => {},
             '\n' => {
                 self.line += 1;
@@ -89,12 +83,8 @@ impl Scanner {
         }
     }
 
-    fn add_token(&mut self, token_type: TokenType) {
-        let t = Token {
-            token_type,
-            lexeme: self.source[self.start..self.current].to_string()
-        };
-        self.tokens.push(t);
+    fn add_token(&mut self, token: Token) {
+        self.tokens.push(token);
     }
 
     fn add_error(&mut self, message: String) {
@@ -149,7 +139,7 @@ impl Scanner {
         }
         self.advance();
         let value = self.source[self.start+1..self.current-1].to_string();
-        self.add_token(TokenType::String(value));
+        self.add_token(Token::String(value));
     }
 
     fn number(&mut self) {
@@ -166,7 +156,7 @@ impl Scanner {
             self.advance();
         }
         let value = self.source[self.start..self.current].parse::<f64>().unwrap();
-        self.add_token(TokenType::Number(value));
+        self.add_token(Token::Number(value));
     }
 
     fn keyword(&mut self) {
@@ -175,9 +165,9 @@ impl Scanner {
         }
         let text = &self.source[self.start..self.current];
         match text {
-            "true" => self.add_token(TokenType::Bool(true)),
-            "false" => self.add_token(TokenType::Bool(false)),
-            "null" => self.add_token(TokenType::Null),
+            "true" => self.add_token(Token::Bool(true)),
+            "false" => self.add_token(Token::Bool(false)),
+            "null" => self.add_token(Token::Null),
             _ => {
                 let err_message = format!("{}: {}", "Unexpected token", text);
                 self.add_error(err_message);
