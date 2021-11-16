@@ -24,8 +24,18 @@ fn main() {
 
     let mut scanner = Scanner::new(input.to_string());
 
-    for t in scanner.scan_tokens() {
-        println!("{:?}", t);
+    match scanner.scan_tokens() {
+        Ok(tokens) => {
+            for t in tokens {
+                println!("{:?}", t);
+            }
+        }
+        Err(errors) => {
+            for e in errors {
+                println!("{:?}", e);
+            }
+            std::process::exit(1);
+        }
     }
 
     let mut parser = Parser::new(scanner.tokens);

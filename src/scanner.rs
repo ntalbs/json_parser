@@ -49,14 +49,18 @@ impl Scanner {
         }
     }
 
-    pub fn scan_tokens(&mut self) -> &Vec<Token> {
+    pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, &Vec<Error>> {
         while !self.is_at_end() {
             self.start = self.current;
             self.scan_token();
         }
         self.add_token(TokenType::EOF);
 
-        &self.tokens
+        if self.errors.len() > 0 {
+            Err(&self.errors)
+        } else {
+            Result::Ok(&self.tokens)
+        }
     }
 
     fn scan_token(&mut self) {
