@@ -36,9 +36,18 @@ impl Parser {
         match token {
             LeftBrace => self.obj(),
             LeftBracket => self.arr(),
-            String(s) => self.str(s.to_string()),
-            Number(n) => self.num(*n),
-            Bool(b) => self.boolean(*b),
+            String(s) => {
+                let s = s.to_string();
+                self.str(s)
+            },
+            Number(n) => {
+                let n = *n;
+                self.num(n)
+            },
+            Bool(b) => {
+                let b = *b;
+                self.boolean(b)
+            },
             Null => self.null(),
             _ => panic!("Invalid Json")
         }
