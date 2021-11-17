@@ -38,8 +38,8 @@ impl Scanner {
             errors: Vec::new(),
             start: 0,
             current: 0,
-            line: 0,
-            pos: 0,
+            line: 1,
+            pos: 1,
         }
     }
 
@@ -69,7 +69,7 @@ impl Scanner {
             ' '|'\t'|'\r' => {},
             '\n' => {
                 self.line += 1;
-                self.pos = 0;
+                self.pos = 1;
             }
             '"' => self.string(),
             '-'|'0'..='9' => self.number(),
