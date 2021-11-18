@@ -1,3 +1,9 @@
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct Pos {
+    line: usize,
+    col: usize
+}
+
 #[derive(Debug, PartialEq)]
 pub enum Token {
     LeftBrace,
@@ -16,8 +22,7 @@ pub enum Token {
 #[derive(Debug)]
 pub struct Error {
     message: String,
-    line: usize,
-    pos: usize,
+    pos: Pos,
 }
 
 pub struct Scanner {
@@ -26,8 +31,7 @@ pub struct Scanner {
     pub errors: Vec<Error>,
     start: usize,
     current: usize,
-    line: usize,
-    pos: usize,
+    pos: Pos,
 }
 
 impl Scanner {
@@ -38,8 +42,7 @@ impl Scanner {
             errors: Vec::new(),
             start: 0,
             current: 0,
-            line: 1,
-            pos: 1,
+            pos: Pos { line: 1, col: 1 }
         }
     }
 
@@ -66,10 +69,10 @@ impl Scanner {
             ']' => self.add_token(Token::RightBracket),
             ':' => self.add_token(Token::Colon),
             ',' => self.add_token(Token::Comma),
-            ' '|'\t'|'\r' => {},
-            '\n' => {
-                self.line += 1;
-                self.pos = 1;
+            ' '|'\t' => {},
+            '\n'|'\r' => {
+                self.pos.line += 1;
+                self.pos.col = 1;
             }
             '"' => self.string(),
             '-'|'0'..='9' => self.number(),
@@ -90,8 +93,10 @@ impl Scanner {
     fn add_error(&mut self, message: String) {
         let e = Error {
              message,
-             line: self.line,
-            pos: self.pos,
+             pos: Pos {
+                line: self.pos.line,
+                col: self.pos.col,
+             },
         };
         self.errors.push(e);
     }
@@ -109,7 +114,7 @@ impl Scanner {
     }
 
     fn advance(&mut self) -> char {
-        self.pos += 1;
+        self.pos.col += 1;
         self.current += 1;
         self.source.chars().nth(self.current-1).unwrap()
     }
