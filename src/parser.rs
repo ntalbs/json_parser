@@ -58,7 +58,7 @@ impl Parser {
         
         let mut m = HashMap::new();
 
-        if self.check(RightBrace) {
+        if matches!(self.peek(), RightBrace) {
             self.advance();
             return Json::Obj(Box::new(m));
         }
@@ -66,20 +66,25 @@ impl Parser {
         let (key, val) = self.member();
         m.insert(key, val);
 
-        while self.check(Comma) {
+        while matches!(self.peek(), Comma) {
             self.advance();
             let (key, val) =self.member();
             m.insert(key, val);
         }
 
-        self.consume(RightBrace, "Invalid token: expected '}".to_string());
+        if matches!(self.peek(), RightBrace) {
+            self.advance();
+        } else {
+            panic!("{}", "Invalid token: expected '}'");
+        }
+
         Json::Obj(Box::new(m))
     }
 
     fn arr(&mut self) -> Json {
         self.advance();
 
-        if self.check(RightBracket) {
+        if matches!(self.peek(), RightBracket) {
             self.advance();
             return Json::Arr(vec![]);
         }
@@ -87,18 +92,29 @@ impl Parser {
         let mut elements = Vec::new();
         elements.push(self.json());
 
-        while self.check(Comma) {
+        while matches!(self.peek(), Comma) {
             self.advance();
             elements.push(self.json());
         }
         
-        self.consume(RightBracket, "invalid token: expected ']'".to_string());
+        if matches!(self.peek(), RightBracket) {
+            self.advance();
+        } else {
+            panic!("Invalid token: expected ']");
+        }
+
         Json::Arr(elements)
     }
 
     fn member(&mut self) -> (String, Json) {
         let key = self.key();
-        self.consume(Colon, "Invalid token: expected ':'".to_string());
+
+        if matches!(self.peek(), Colon) {
+            self.advance();
+        } else {
+            panic!("Invalid token: expected ':");
+        }
+
         let val = self.json();
 
         (key, val)
@@ -138,13 +154,6 @@ impl Parser {
         self.previous()
     }
 
-    fn check(&self, token: Token) -> bool {
-        if self.is_at_end() {
-            return false;
-        }
-        *self.peek() == token
-    }
-
     fn is_at_end(&self) -> bool {
         *self.peek() == Token::EOF
     }
@@ -155,12 +164,5 @@ impl Parser {
 
     fn previous(&self) -> &Token {
         &self.tokens[self.current - 1]
-    }
-
-    fn consume(&mut self, token: Token, message: String) -> &Token {
-        if self.check(token) {
-            return self.advance();
-        }
-        panic!("{}", message);
     }
 }
