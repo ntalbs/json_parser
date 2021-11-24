@@ -53,10 +53,10 @@ impl Scanner {
         }
         self.add_token(Token::EOF);
 
-        if self.errors.len() > 0 {
-            Err(&self.errors)
-        } else {
+        if self.errors.is_empty() {
             Result::Ok(&self.tokens)
+        } else {
+            Err(&self.errors)
         }
     }
 
