@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::string::String;
 
-use crate::scanner::Token;
+use crate::scanner::{Error, Token};
 use crate::scanner::Token::*;
 
 #[derive(Debug)]
@@ -16,6 +16,7 @@ pub enum Json {
 
 pub struct Parser {
     tokens: Vec<Token>,
+    errors: Vec<Error>,
     current: usize,
 }
 
@@ -23,12 +24,18 @@ impl Parser {
     pub fn new(tokens: Vec<Token>) -> Self {
         Parser {
             tokens,
+            errors: Vec::new(),
             current: 0
         }
     }
 
-    pub fn parse(&mut self) -> Json {
-        self.json()
+    pub fn parse(&mut self) -> Result<Json, &Vec<Error>> {
+        let json = self.json();
+        if self.errors.is_empty() {
+            Ok(json)
+        } else {
+            Err(&self.errors)
+        }
     }
 
     fn json(&mut self) -> Json {

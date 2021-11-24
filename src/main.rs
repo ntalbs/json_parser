@@ -1,7 +1,7 @@
 mod scanner;
 mod parser;
 
-use scanner::Scanner;
+use scanner::{Scanner, Error};
 use parser::Parser;
 
 fn main() {
@@ -24,6 +24,12 @@ fn main() {
 
     let mut scanner = Scanner::new(input.to_string());
 
+    fn print_errors(errors: &Vec<Error>) {
+        for e in errors {
+            println!("{:?}", e);
+        }
+    }
+
     match scanner.scan_tokens() {
         Ok(tokens) => {
             for t in tokens {
@@ -31,15 +37,17 @@ fn main() {
             }
         }
         Err(errors) => {
-            for e in errors {
-                println!("{:?}", e);
-            }
+            print_errors(errors);
             std::process::exit(1);
         }
     }
 
     let mut parser = Parser::new(scanner.tokens);
-    let json = parser.parse();
-
-    println!("{:?}", json);
+    match  parser.parse() {
+        Ok(json) =>  println!("{:?}", json),
+        Err(errors) => {
+            print_errors(errors);
+            std::process::exit(1);
+        }
+    };
 }
