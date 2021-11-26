@@ -1,7 +1,15 @@
+use std::fmt::Display;
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Pos {
     line: usize,
     col: usize,
+}
+
+impl Display for Pos {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("{}:{}", self.line, self.col))
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -19,10 +27,28 @@ pub enum Token {
     EOF,
 }
 
+impl Token {
+    pub fn pos(&self) -> Pos {
+        match self {
+            Self::LeftBrace(pos) => *pos,
+            Self::RightBrace(pos) => *pos,
+            Self::LeftBracket(pos) => *pos,
+            Self::RightBracket(pos) => *pos,
+            Self::Colon(pos) => *pos,
+            Self::Comma(pos) => *pos,
+            Self::String(_, pos) => *pos,
+            Self::Number(_, pos) => *pos,
+            Self::Bool(_, pos) => *pos,
+            Self::Null(pos) => *pos,
+            _ => panic!("EOF doesn't have pos!"),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Error {
-    message: String,
-    pos: Pos,
+    pub message: String,
+    pub pos: Pos,
 }
 
 pub struct Scanner {
@@ -93,10 +119,7 @@ impl Scanner {
     fn add_error(&mut self, message: String) {
         let e = Error {
              message,
-             pos: Pos {
-                line: self.pos.line,
-                col: self.pos.col,
-             },
+             pos: self.pos,
         };
         self.errors.push(e);
     }

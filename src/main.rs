@@ -24,6 +24,10 @@ fn main() {
 
     let mut scanner = Scanner::new(input.to_string());
 
+    fn print_error(e: Error) {
+        println!("{} at {}", e.message, e.pos);
+    }
+
     fn print_errors(errors: &Vec<Error>) {
         for e in errors {
             println!("{:?}", e);
@@ -43,11 +47,13 @@ fn main() {
     }
 
     let mut parser = Parser::new(scanner.tokens);
-    match  parser.parse() {
-        Ok(json) =>  println!("{:?}", json),
-        Err(errors) => {
-            print_errors(errors);
+    let json = match  parser.parse() {
+        Ok(json) =>  json,
+        Err(e) => {
+            print_error(e);
             std::process::exit(1);
         }
     };
+
+    println!("{:?}", json);
 }
