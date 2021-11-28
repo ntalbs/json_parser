@@ -1,8 +1,10 @@
 mod scanner;
 mod parser;
+mod construct;
 
-use scanner::{Scanner, Error};
+use scanner::Scanner;
 use parser::Parser;
+use construct::Error;
 
 fn main() {
     let input = r#"
@@ -30,7 +32,7 @@ fn main() {
 
     fn print_errors(errors: &Vec<Error>) {
         for e in errors {
-            println!("{:?}", e);
+            println!("{} at {}", e.message, e.pos);
         }
     }
 

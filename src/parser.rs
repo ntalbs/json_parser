@@ -1,19 +1,8 @@
 use std::collections::HashMap;
 use std::string::String;
 
-use crate::scanner::{Error, Pos, Token};
-use crate::scanner::Token::*;
-
-#[derive(Debug)]
-pub enum Json {
-    Null,
-    Bool(bool),
-    Num(f64),
-    Str(String),
-    Obj(Box<HashMap<String, Json>>),
-    Arr(Vec<Json>),
-    Err(Error),
-}
+use crate::construct::{Error, Pos, Token, Json};
+use crate::construct::Token::*;
 
 pub struct Parser<'a> {
     tokens: &'a Vec<Token>,
@@ -49,11 +38,11 @@ impl <'a> Parser<'a> {
                 let n = *n;
                 self.num(n)
             },
-            Bool(b, _) => {
+            Token::Bool(b, _) => {
                 let b = *b;
                 self.boolean(b)
             },
-            Null(_) => self.null(),
+            Token::Null(_) => self.null(),
             _ => {
                 let pos = token.pos();
                 self.err("Invalid Json".to_string(), pos)
