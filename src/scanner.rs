@@ -45,6 +45,34 @@ impl Token {
     }
 }
 
+impl Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::LeftBrace(pos) =>
+                f.write_fmt(format_args!("'{{' at {}", pos)),
+            Self::RightBrace(pos) =>
+                f.write_fmt(format_args!("'}}' at {}", pos)),
+            Self::LeftBracket(pos) =>
+                f.write_fmt(format_args!("'[' at {}", pos)),
+            Self::RightBracket(pos) =>
+                f.write_fmt(format_args!("']' at {}", pos)),
+            Self::Colon(pos) =>
+                f.write_fmt(format_args!("':' at {}", pos)),
+            Self::Comma(pos) =>
+                f.write_fmt(format_args!("'{{' at {}", pos)),
+            Self::String(s, pos) =>
+                f.write_fmt(format_args!("\"{}\" at {}", s, pos)),
+            Self::Number(n, pos) =>
+                f.write_fmt(format_args!("{} at {}", n, pos)),
+            Self::Bool(b, pos) =>
+                f.write_fmt(format_args!("{} at {}", b, pos)),
+            Self::Null(pos) =>
+                f.write_fmt(format_args!("null at {}", pos)),
+            Self::EOF => f.write_str("EOF"),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Error {
     pub message: String,

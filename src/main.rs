@@ -37,7 +37,7 @@ fn main() {
     let tokens = match scanner.scan_tokens() {
         Ok(tokens) => {
             for t in tokens {
-                println!("{:?}", t);
+                println!("{}", t);
             }
             tokens
         }
