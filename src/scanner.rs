@@ -1,16 +1,16 @@
 use crate::construct::{Error, Pos, Token};
 
-pub struct Scanner {
-    source: String,
-    tokens: Vec<Token>,
+pub struct Scanner<'a> {
+    source: &'a str,
+    tokens: Vec<Token<'a>>,
     errors: Vec<Error>,
     start: usize,
     current: usize,
     pos: Pos,
 }
 
-impl Scanner {
-    pub fn new(input: String) -> Scanner {
+impl <'a> Scanner<'a> {
+    pub fn new(input: &'a str) -> Scanner<'a> {
         Scanner {
             source: input,
             tokens: Vec::new(),
@@ -61,7 +61,7 @@ impl Scanner {
         }
     }
 
-    fn add_token(&mut self, token: Token) {
+    fn add_token(&mut self, token: Token<'a>) {
         self.tokens.push(token);
     }
 
@@ -115,7 +115,7 @@ impl Scanner {
             self.add_error("Unterminated string".to_string());
         }
         self.advance();
-        let value = self.source[self.start+1..self.current-1].to_string();
+        let value= &self.source[self.start + 1 .. self.current - 1];
         self.add_token(Token::String(value, self.pos));
     }
 

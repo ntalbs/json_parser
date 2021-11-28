@@ -5,7 +5,7 @@ use crate::construct::{Error, Pos, Token, Json};
 use crate::construct::Token::*;
 
 pub struct Parser<'a> {
-    tokens: &'a Vec<Token>,
+    tokens: &'a Vec<Token<'a>>,
     current: usize,
 }
 

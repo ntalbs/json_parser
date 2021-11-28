@@ -24,7 +24,7 @@ fn main() {
     }
     "#;
 
-    let mut scanner = Scanner::new(input.to_string());
+    let mut scanner = Scanner::new(input);
 
     fn print_error(e: Error) {
         println!("{} at {}", e.message, e.pos);

@@ -7,27 +7,27 @@ pub struct Pos {
 }
 
 impl Display for Pos {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.write_fmt(format_args!("{}:{}", self.line, self.col))
     }
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Token {
+pub enum Token<'a> {
     LeftBrace(Pos),
     RightBrace(Pos),
     LeftBracket(Pos),
     RightBracket(Pos),
     Colon(Pos),
     Comma(Pos),
-    String(std::string::String, Pos),
+    String(&'a str, Pos),
     Number(f64, Pos),
     Bool(bool, Pos),
     Null(Pos),
     EOF,
 }
 
-impl Token {
+impl <'a> Token<'a> {
     pub fn pos(&self) -> Pos {
         match self {
             Self::LeftBrace(pos) => *pos,
@@ -45,7 +45,7 @@ impl Token {
     }
 }
 
-impl Display for Token {
+impl <'a> Display for Token<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::LeftBrace(pos) =>
