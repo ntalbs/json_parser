@@ -34,19 +34,20 @@ fn main() {
         }
     }
 
-    match scanner.scan_tokens() {
+    let tokens = match scanner.scan_tokens() {
         Ok(tokens) => {
             for t in tokens {
                 println!("{:?}", t);
             }
+            tokens
         }
         Err(errors) => {
             print_errors(errors);
             std::process::exit(1);
         }
-    }
+    };
 
-    let mut parser = Parser::new(scanner.tokens);
+    let mut parser = Parser::new(tokens);
     let json = match  parser.parse() {
         Ok(json) =>  json,
         Err(e) => {
