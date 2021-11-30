@@ -28,21 +28,21 @@ impl <'a> Parser<'a> {
     fn json(&mut self) -> Json {
         let token = self.advance();
         match token {
-            LeftBrace(_) => self.obj(),
-            LeftBracket(_) => self.arr(),
-            String(s, _) => {
-                let s = s.to_string();
+            LeftBrace {..} => self.obj(),
+            LeftBracket{..} => self.arr(),
+            Token::String {val, ..} => {
+                let s = val.to_string();
                 self.str(s)
             },
-            Number(n, _) => {
-                let n = *n;
+            Number { val, .. } => {
+                let n = *val;
                 self.num(n)
             },
-            Token::Bool(b, _) => {
-                let b = *b;
+            Token::Bool { val, .. } => {
+                let b = *val;
                 self.boolean(b)
             },
-            Token::Null(_) => self.null(),
+            Token::Null {..} => self.null(),
             _ => {
                 let pos = token.pos();
                 self.err("Invalid Json".to_string(), pos)
@@ -53,7 +53,7 @@ impl <'a> Parser<'a> {
     fn obj(&mut self) -> Json {
         let mut m = HashMap::new();
 
-        if matches!(self.peek(), RightBrace(_)) {
+        if matches!(self.peek(), RightBrace{..}) {
             self.advance();
             return Json::Obj(Box::new(m));
         }
@@ -64,13 +64,13 @@ impl <'a> Parser<'a> {
                 Err(e) => return Json::Err(e)
             };
             m.insert(key, val);
-            if !matches!(self.peek(), Comma(_)) {
+            if !matches!(self.peek(), Comma{..}) {
                 break;
             }
             self.advance();
         }
 
-        if matches!(self.peek(), RightBrace(_)) {
+        if matches!(self.peek(), RightBrace{..}) {
             self.advance();
             Json::Obj(Box::new(m))
         } else {
@@ -80,7 +80,7 @@ impl <'a> Parser<'a> {
     }
 
     fn arr(&mut self) -> Json {
-        if matches!(self.peek(), RightBracket(_)) {
+        if matches!(self.peek(), RightBracket{..}) {
             self.advance();
             return Json::Arr(vec![]);
         }
@@ -88,12 +88,12 @@ impl <'a> Parser<'a> {
         let mut elements = Vec::new();
         elements.push(self.json());
 
-        while matches!(self.peek(), Comma(_)) {
+        while matches!(self.peek(), Comma{..}) {
             self.advance();
             elements.push(self.json());
         }
         
-        if matches!(self.peek(), RightBracket(_)) {
+        if matches!(self.peek(), RightBracket{..}) {
             self.advance();
             Json::Arr(elements)
         } else {
@@ -104,7 +104,7 @@ impl <'a> Parser<'a> {
 
     fn member(&mut self) -> Result<(String, Json), Error> {
         let key = match &self.advance() {
-            String(s, _) => s.to_string(),
+            Token::String { val, ..} => val.to_string(),
             _ => return Err(Error {
                 message: "Invalid token: expected string".to_string(),
                 pos: self.peek().pos(),
@@ -112,7 +112,7 @@ impl <'a> Parser<'a> {
         };
 
         let val = match self.advance() {
-            Colon(_) => self.json(),
+            Colon{..} => self.json(),
             _ => return Err(Error {
                 message: "Invalid token: expected ':'".to_string(),
                 pos: self.peek().pos(),

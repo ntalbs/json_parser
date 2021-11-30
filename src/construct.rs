@@ -14,32 +14,32 @@ impl Display for Pos {
 
 #[derive(Debug, PartialEq)]
 pub enum Token<'a> {
-    LeftBrace(Pos),
-    RightBrace(Pos),
-    LeftBracket(Pos),
-    RightBracket(Pos),
-    Colon(Pos),
-    Comma(Pos),
-    String(&'a str, Pos),
-    Number(f64, Pos),
-    Bool(bool, Pos),
-    Null(Pos),
+    LeftBrace    { lexeme: &'a str, pos: Pos },
+    RightBrace   { lexeme: &'a str, pos: Pos },
+    LeftBracket  { lexeme: &'a str, pos: Pos },
+    RightBracket { lexeme: &'a str, pos: Pos },
+    Colon        { lexeme: &'a str, pos: Pos },
+    Comma        { lexeme: &'a str, pos: Pos },
+    String       { lexeme: &'a str, val: &'a str, pos: Pos },
+    Number       { lexeme: &'a str, val: f64, pos: Pos },
+    Bool         { lexeme: &'a str, val: bool, pos: Pos },
+    Null         { lexeme: &'a str, pos: Pos },
     EOF,
 }
 
 impl <'a> Token<'a> {
     pub fn pos(&self) -> Pos {
         match self {
-            Self::LeftBrace(pos) => *pos,
-            Self::RightBrace(pos) => *pos,
-            Self::LeftBracket(pos) => *pos,
-            Self::RightBracket(pos) => *pos,
-            Self::Colon(pos) => *pos,
-            Self::Comma(pos) => *pos,
-            Self::String(_, pos) => *pos,
-            Self::Number(_, pos) => *pos,
-            Self::Bool(_, pos) => *pos,
-            Self::Null(pos) => *pos,
+            Self::LeftBrace    { pos, .. } => *pos,
+            Self::RightBrace   { pos, .. } => *pos,
+            Self::LeftBracket  { pos, .. } => *pos,
+            Self::RightBracket { pos, .. } => *pos,
+            Self::Colon        { pos, .. } => *pos,
+            Self::Comma        { pos, .. } => *pos,
+            Self::String       { pos, .. } => *pos,
+            Self::Number       { pos, .. } => *pos,
+            Self::Bool         { pos, .. } => *pos,
+            Self::Null         { pos, .. } => *pos,
             _ => panic!("EOF doesn't have pos!"),
         }
     }
@@ -48,27 +48,19 @@ impl <'a> Token<'a> {
 impl <'a> Display for Token<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::LeftBrace(pos) =>
-                f.write_fmt(format_args!("'{{' at {}", pos)),
-            Self::RightBrace(pos) =>
-                f.write_fmt(format_args!("'}}' at {}", pos)),
-            Self::LeftBracket(pos) =>
-                f.write_fmt(format_args!("'[' at {}", pos)),
-            Self::RightBracket(pos) =>
-                f.write_fmt(format_args!("']' at {}", pos)),
-            Self::Colon(pos) =>
-                f.write_fmt(format_args!("':' at {}", pos)),
-            Self::Comma(pos) =>
-                f.write_fmt(format_args!("'{{' at {}", pos)),
-            Self::String(s, pos) =>
-                f.write_fmt(format_args!("\"{}\" at {}", s, pos)),
-            Self::Number(n, pos) =>
-                f.write_fmt(format_args!("{} at {}", n, pos)),
-            Self::Bool(b, pos) =>
-                f.write_fmt(format_args!("{} at {}", b, pos)),
-            Self::Null(pos) =>
-                f.write_fmt(format_args!("null at {}", pos)),
-            Self::EOF => f.write_str("EOF"),
+            Self::LeftBrace    { lexeme, pos, .. } |
+            Self::RightBrace   { lexeme, pos, .. } |
+            Self::LeftBracket  { lexeme, pos, .. } |
+            Self::RightBracket { lexeme, pos, .. } |
+            Self::Colon        { lexeme, pos, .. } |
+            Self::Comma        { lexeme, pos, .. } |
+            Self::String       { lexeme, pos, .. } |
+            Self::Number       { lexeme, pos, .. } |
+            Self::Bool         { lexeme, pos, .. } |
+            Self::Null         { lexeme, pos, .. } =>
+                f.write_fmt(format_args!("'{}' at {}", lexeme, pos)),
+            Self::EOF =>
+                f.write_str("EOF"),
         }
     }
 }

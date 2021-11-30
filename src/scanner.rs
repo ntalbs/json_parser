@@ -38,12 +38,30 @@ impl <'a> Scanner<'a> {
     fn scan_token(&mut self) {
         let c = self.advance();
         match c {
-            '{' => self.add_token(Token::LeftBrace(self.pos)),
-            '}' => self.add_token(Token::RightBrace(self.pos)),
-            '[' => self.add_token(Token::LeftBracket(self.pos)),
-            ']' => self.add_token(Token::RightBracket(self.pos)),
-            ':' => self.add_token(Token::Colon(self.pos)),
-            ',' => self.add_token(Token::Comma(self.pos)),
+            '{' => self.add_token(Token::LeftBrace {
+                lexeme: "{",
+                pos: self.pos
+            }),
+            '}' => self.add_token(Token::RightBrace {
+                lexeme: "}",
+                pos: self.pos
+            }),
+            '[' => self.add_token(Token::LeftBracket {
+                lexeme: "[",
+                pos: self.pos
+            }),
+            ']' => self.add_token(Token::RightBracket {
+                lexeme: "]",
+                pos: self.pos
+            }),
+            ':' => self.add_token(Token::Colon {
+                lexeme: ":",
+                pos: self.pos
+            }),
+            ',' => self.add_token(Token::Comma {
+                lexeme: ",",
+                pos: self.pos
+            }),
             ' '|'\t' => {},
             '\n'|'\r' => {
                 self.pos.line += 1;
@@ -115,8 +133,13 @@ impl <'a> Scanner<'a> {
             self.add_error("Unterminated string".to_string());
         }
         self.advance();
-        let value= &self.source[self.start + 1 .. self.current - 1];
-        self.add_token(Token::String(value, self.pos));
+        let lexeme = &self.source[self.start .. self.current]; 
+        let val= &self.source[self.start + 1 .. self.current - 1];
+        self.add_token(Token::String {
+            lexeme,
+            val,
+            pos: self.pos
+        });
     }
 
     fn number(&mut self) {
@@ -132,21 +155,32 @@ impl <'a> Scanner<'a> {
         while self.peek().unwrap().is_digit(10) {
             self.advance();
         }
-        let value = self.source[self.start..self.current].parse::<f64>().unwrap();
-        self.add_token(Token::Number(value, self.pos));
+        let lexeme = &self.source[self.start..self.current];
+        let val = lexeme.parse::<f64>().unwrap();
+        self.add_token(Token::Number {
+            lexeme,
+            val,
+            pos: self.pos
+        });
     }
 
     fn keyword(&mut self) {
         while self.peek().unwrap().is_alphabetic() {
             self.advance();
         }
-        let text = &self.source[self.start..self.current];
-        match text {
-            "true" => self.add_token(Token::Bool(true, self.pos)),
-            "false" => self.add_token(Token::Bool(false, self.pos)),
-            "null" => self.add_token(Token::Null(self.pos)),
+        let lexeme = &self.source[self.start..self.current];
+        match lexeme {
+            "true" | "false" => self.add_token(Token::Bool {
+                lexeme,
+                val: lexeme.parse::<bool>().unwrap(),
+                pos: self.pos
+            }),
+            "null" => self.add_token(Token::Null {
+                lexeme,
+                pos: self.pos
+            }),
             _ => {
-                let err_message = format!("{}: {}", "Unexpected token", text);
+                let err_message = format!("{}: {}", "Unexpected token", lexeme);
                 self.add_error(err_message);
             }
         }
