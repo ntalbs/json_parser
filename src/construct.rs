@@ -48,17 +48,21 @@ impl <'a> Token<'a> {
 impl <'a> Display for Token<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::LeftBrace    { lexeme, pos, .. } |
-            Self::RightBrace   { lexeme, pos, .. } |
-            Self::LeftBracket  { lexeme, pos, .. } |
-            Self::RightBracket { lexeme, pos, .. } |
-            Self::Colon        { lexeme, pos, .. } |
-            Self::Comma        { lexeme, pos, .. } |
-            Self::String       { lexeme, pos, .. } |
-            Self::Number       { lexeme, pos, .. } |
-            Self::Bool         { lexeme, pos, .. } |
-            Self::Null         { lexeme, pos, .. } =>
+            Self::LeftBrace    { lexeme, pos } |
+            Self::RightBrace   { lexeme, pos } |
+            Self::LeftBracket  { lexeme, pos } |
+            Self::RightBracket { lexeme, pos } |
+            Self::Colon        { lexeme, pos } |
+            Self::Comma        { lexeme, pos } =>
                 f.write_fmt(format_args!("'{}' at {}", lexeme, pos)),
+            Self::String       { lexeme, pos, val } =>
+                f.write_fmt(format_args!("'{}' => \"{}\" at {}", lexeme, val, pos)),
+            Self::Number       { lexeme, pos, val } =>
+                f.write_fmt(format_args!("'{}' => {} at {}", lexeme, val, pos)),
+            Self::Bool         { lexeme, pos, val } =>
+                f.write_fmt(format_args!("'{}' => {} at {}", lexeme, val, pos)),
+            Self::Null         { lexeme, pos } =>
+                f.write_fmt(format_args!("'{}' => null at {}", lexeme, pos)),
             Self::EOF =>
                 f.write_str("EOF"),
         }
