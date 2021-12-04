@@ -109,24 +109,16 @@ impl <'a> Scanner<'a> {
         self.source.chars().nth(self.current-1).unwrap()
     }
 
-    fn peek(&self) -> Option<char> {
-        if self.is_at_end() {
-            return None
-        } else {
-            self.source.chars().nth(self.current)
-        }
+    fn peek(&self) -> char {
+        self.source.chars().nth(self.current).unwrap()
     }
 
-    fn peek_next(&self) -> Option<char> {
-        if self.current + 1 >= self.source.len() {
-            None
-        } else {
-            self.source.chars().nth(self.current + 1)
-        }
+    fn peek_next(&self) -> char {
+        self.source.chars().nth(self.current + 1).unwrap()
     }
 
     fn string(&mut self) {
-        while self.peek().unwrap() != '"' && !self.is_at_end() {
+        while self.peek() != '"' && !self.is_at_end() {
             self.advance();
         }
         if self.is_at_end() {
@@ -143,16 +135,16 @@ impl <'a> Scanner<'a> {
     }
 
     fn number(&mut self) {
-        if self.peek().unwrap() == '-' {
+        if self.peek() == '-' {
             self.advance();
         }
-        while self.is_digit(self.peek().unwrap()) {
+        while self.is_digit(self.peek()) {
             self.advance();
         }
-        if self.peek().unwrap() == '.' && self.peek_next().unwrap().is_digit(10) {
+        if self.peek() == '.' && self.peek_next().is_digit(10) {
             self.advance();
         }
-        while self.peek().unwrap().is_digit(10) {
+        while self.peek().is_digit(10) {
             self.advance();
         }
         let lexeme = &self.source[self.start..self.current];
@@ -165,7 +157,7 @@ impl <'a> Scanner<'a> {
     }
 
     fn keyword(&mut self) {
-        while self.peek().unwrap().is_alphabetic() {
+        while self.peek().is_alphabetic() {
             self.advance();
         }
         let lexeme = &self.source[self.start..self.current];
