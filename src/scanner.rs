@@ -118,12 +118,18 @@ impl <'a> Scanner<'a> {
     }
 
     fn string(&mut self) {
-        while self.peek() != '"' && !self.is_at_end() {
+        loop {
+            let c = self.peek();
+            if c == '"' {  // end of string
+                break;
+            }
+            if c == '\n' || self.is_at_end() {
+                self.add_error("Unterminated string".to_string());
+                break;
+            }
             self.advance();
         }
-        if self.is_at_end() {
-            self.add_error("Unterminated string".to_string());
-        }
+
         self.advance();
         let lexeme = &self.source[self.start .. self.current]; 
         let val= &self.source[self.start + 1 .. self.current - 1];
