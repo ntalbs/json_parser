@@ -24,7 +24,11 @@ impl <'a> Scanner<'a> {
     pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, &Vec<Error>> {
         while !self.is_at_end() {
             self.start = self.current;
-            self.scan_token();
+            let token = self.scan_token();
+            match token {
+                Ok(t) => self.add_token(t),
+                Err(e) => self.add_error(e),
+            };
         }
         self.add_token(Token::EOF);
 
@@ -35,59 +39,72 @@ impl <'a> Scanner<'a> {
         }
     }
 
-    fn scan_token(&mut self) {
-        let c = self.advance();
+    fn scan_token(&mut self) -> Result<Token<'a>, Error> {
+        let c = self.skip_whitespaces();
         match c {
-            '{' => self.add_token(Token::LeftBrace {
+            '{' => Ok(Token::LeftBrace {
                 lexeme: "{",
                 pos: self.pos
             }),
-            '}' => self.add_token(Token::RightBrace {
+            '}' => Ok(Token::RightBrace {
                 lexeme: "}",
                 pos: self.pos
             }),
-            '[' => self.add_token(Token::LeftBracket {
+            '[' => Ok(Token::LeftBracket {
                 lexeme: "[",
                 pos: self.pos
             }),
-            ']' => self.add_token(Token::RightBracket {
+            ']' => Ok(Token::RightBracket {
                 lexeme: "]",
                 pos: self.pos
             }),
-            ':' => self.add_token(Token::Colon {
+            ':' => Ok(Token::Colon {
                 lexeme: ":",
                 pos: self.pos
             }),
-            ',' => self.add_token(Token::Comma {
+            ',' => Ok(Token::Comma {
                 lexeme: ",",
                 pos: self.pos
             }),
-            ' '|'\t' => {},
-            '\n'|'\r' => {
-                self.pos.line += 1;
-                self.pos.col = 1;
-            }
             '"' => self.string(),
             '-'|'0'..='9' => self.number(),
             _ => {
                 if self.is_alpha(c) {
-                    self.keyword();
+                    self.keyword()
                 } else {
-                    self.add_error("Unexpected token.".to_string());
+                    Err(Error {
+                        message: "Unexpected token.".to_string(),
+                        pos: self.pos,
+                    })
                 }
             }
         }
     }
 
-    fn add_token(&mut self, token: Token<'a>) {
-        self.tokens.push(token);
+    fn skip_whitespaces(&mut self) -> char {
+        loop {
+            let c = self.advance();
+            match c {
+                ' ' | '\t' => {
+                    self.start = self.current;
+                },
+                '\n' | '\r' => {
+                    self.start = self.current;
+                    self.pos.line += 1;
+                    self.pos.col = 1;    
+                }
+                _ => {
+                    return c;
+                }
+            }
+        }
     }
 
-    fn add_error(&mut self, message: String) {
-        let e = Error {
-             message,
-             pos: self.pos,
-        };
+    fn add_token(&mut self, t: Token<'a>) {
+        self.tokens.push(t);
+    }
+
+    fn add_error(&mut self, e: Error) {
         self.errors.push(e);
     }
 
@@ -117,15 +134,17 @@ impl <'a> Scanner<'a> {
         self.source.chars().nth(self.current + 1).unwrap()
     }
 
-    fn string(&mut self) {
+    fn string(&mut self) -> Result<Token<'a>, Error> {
         loop {
             let c = self.peek();
             if c == '"' {  // end of string
                 break;
             }
             if c == '\n' || self.is_at_end() {
-                self.add_error("Unterminated string".to_string());
-                break;
+                return Err(Error {
+                    message: "Unterminated string".to_string(),
+                    pos: self.pos,
+                })
             }
             self.advance();
         }
@@ -133,14 +152,15 @@ impl <'a> Scanner<'a> {
         self.advance();
         let lexeme = &self.source[self.start .. self.current]; 
         let val= &self.source[self.start + 1 .. self.current - 1];
-        self.add_token(Token::String {
+        
+        Ok(Token::String {
             lexeme,
             val,
-            pos: self.pos
-        });
+            pos: self.pos,
+        })
     }
 
-    fn number(&mut self) {
+    fn number(&mut self) -> Result<Token<'a>, Error> {
         if self.peek() == '-' {
             self.advance();
         }
@@ -154,32 +174,35 @@ impl <'a> Scanner<'a> {
             self.advance();
         }
         let lexeme = &self.source[self.start..self.current];
+        println!(">>>|{}|", lexeme);
         let val = lexeme.parse::<f64>().unwrap();
-        self.add_token(Token::Number {
+        Ok(Token::Number {
             lexeme,
             val,
             pos: self.pos
-        });
+        })
     }
 
-    fn keyword(&mut self) {
+    fn keyword(&mut self) -> Result<Token<'a>, Error> {
         while self.peek().is_alphabetic() {
             self.advance();
         }
         let lexeme = &self.source[self.start..self.current];
         match lexeme {
-            "true" | "false" => self.add_token(Token::Bool {
+            "true" | "false" => Ok(Token::Bool {
                 lexeme,
                 val: lexeme.parse::<bool>().unwrap(),
                 pos: self.pos
             }),
-            "null" => self.add_token(Token::Null {
+            "null" => Ok(Token::Null {
                 lexeme,
                 pos: self.pos
             }),
             _ => {
-                let err_message = format!("{}: {}", "Unexpected token", lexeme);
-                self.add_error(err_message);
+                Err(Error {
+                    message: format!("{}: {}", "Unexpected token", lexeme),
+                    pos: self.pos,
+               })
             }
         }
     }
