@@ -36,7 +36,11 @@ impl <'a> Scanner<'a> {
     }
 
     fn scan_token(&mut self) {
-        let c = self.advance();
+        let o = self.advance();
+        let c = match o {
+            None => return,
+            Some(c) => c
+        };
         match c {
             '{' => self.add_token(Token::LeftBrace {
                 lexeme: "{",
@@ -103,29 +107,45 @@ impl <'a> Scanner<'a> {
         c.is_alphabetic()
     }
 
-    fn advance(&mut self) -> char {
-        self.pos.col += 1;
-        self.current += 1;
-        self.source.chars().nth(self.current-1).unwrap()
+    fn is_alnum(&self, c: char) -> bool {
+        self.is_alpha(c) || self.is_digit(c)
     }
 
-    fn peek(&self) -> char {
-        self.source.chars().nth(self.current).unwrap()
+    fn advance(&mut self) -> Option<char> {
+        if self.is_at_end() {
+            None
+        } else {
+            self.pos.col += 1;
+            self.current += 1;
+            Some(self.source.chars().nth(self.current-1).unwrap())
+        }
     }
 
-    fn peek_next(&self) -> char {
-        self.source.chars().nth(self.current + 1).unwrap()
+    fn peek(&self) -> Option<char> {
+        if self.is_at_end() {
+            None
+        } else {
+            self.source.chars().nth(self.current)
+        }
+    }
+
+    fn peek_next(&self) -> Option<char> {
+        if self.is_at_end() {
+            None
+        } else {
+            self.source.chars().nth(self.current + 1)
+        }
     }
 
     fn string(&mut self) {
         loop {
-            let c = self.peek();
-            if c == '"' {  // end of string
-                break;
-            }
-            if c == '\n' || self.is_at_end() {
-                self.add_error("Unterminated string".to_string());
-                break;
+            match self.peek() {
+                Some('"') => break,
+                Some('\n') | None => {
+                    self.add_error("Unterminated string".to_string());
+                    break;
+                },
+                Some(_) => {}
             }
             self.advance();
         }
@@ -141,18 +161,22 @@ impl <'a> Scanner<'a> {
     }
 
     fn number(&mut self) {
-        if self.peek() == '-' {
+        // unwrap() is safe here as this envoked when the char is digit or '-'
+        if self.peek().unwrap() == '-' {
             self.advance();
         }
-        while self.is_digit(self.peek()) {
-            self.advance();
+
+        self.digits();
+
+        match (self.peek(), self.peek_next()) {
+            (Some('.'), Some(c)) => if self.is_digit(c) {
+                self.advance();
+                self.advance();
+            }
+            _ => {},
         }
-        if self.peek() == '.' && self.peek_next().is_digit(10) {
-            self.advance();
-        }
-        while self.peek().is_digit(10) {
-            self.advance();
-        }
+        self.digits();
+
         let lexeme = &self.source[self.start..self.current];
         let val = lexeme.parse::<f64>().unwrap();
         self.add_token(Token::Number {
@@ -162,10 +186,31 @@ impl <'a> Scanner<'a> {
         });
     }
 
-    fn keyword(&mut self) {
-        while self.peek().is_alphabetic() {
-            self.advance();
+    fn digits(&mut self) {
+        loop {
+            match self.peek() {
+                Some(c) => if self.is_digit(c) {
+                    self.advance();
+                } else {
+                    break;
+                },
+                _ => break,
+            }
         }
+    }
+
+    fn keyword(&mut self) {
+        loop {
+            match self.peek() {
+                Some(c) => if self.is_alnum(c) {
+                    self.advance();
+                } else {
+                    break;
+                },
+                _ => break,
+            }
+        }
+
         let lexeme = &self.source[self.start..self.current];
         match lexeme {
             "true" | "false" => self.add_token(Token::Bool {
