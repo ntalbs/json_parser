@@ -30,9 +30,16 @@ fn main() {
         println!("{} at {}", e.message, e.pos);
     }
 
-    fn print_errors(errors: &Vec<Error>) {
+    fn print_errors(errors: &Vec<Error>, input: &str) {
+        let lines: Vec<&str> = input.lines().collect();
+        for l in &lines {
+            println!("|{}|", l);
+        }
+
         for e in errors {
             println!("{} at {}", e.message, e.pos);
+            println!("{}", lines[e.pos.line-1]);
+            println!("{}^\n", " ".repeat(e.pos.col));
         }
     }
 
@@ -44,7 +51,7 @@ fn main() {
             tokens
         }
         Err(errors) => {
-            print_errors(errors);
+            print_errors(errors, input);
             std::process::exit(1);
         }
     };
