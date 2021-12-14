@@ -143,7 +143,7 @@ impl<'a> Parser<'a> {
     }
 
     fn err(&mut self, message: String, pos: Pos) -> Json {
-        let e = Error { message, pos: pos };
+        let e = Error { message, pos };
         Json::Err(e)
     }
 
