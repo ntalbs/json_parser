@@ -1,20 +1,17 @@
 use std::collections::HashMap;
 use std::string::String;
 
-use crate::construct::{Error, Pos, Token, Json};
 use crate::construct::Token::*;
+use crate::construct::{Error, Json, Pos, Token};
 
 pub struct Parser<'a> {
     tokens: &'a Vec<Token<'a>>,
     current: usize,
 }
 
-impl <'a> Parser<'a> {
+impl<'a> Parser<'a> {
     pub fn new(tokens: &'a Vec<Token>) -> Self {
-        Parser {
-            tokens,
-            current: 0
-        }
+        Parser { tokens, current: 0 }
     }
 
     pub fn parse(&mut self) -> Result<Json, Error> {
@@ -28,21 +25,21 @@ impl <'a> Parser<'a> {
     fn json(&mut self) -> Json {
         let token = self.advance();
         match token {
-            LeftBrace {..} => self.obj(),
-            LeftBracket{..} => self.arr(),
-            Token::String {val, ..} => {
+            LeftBrace { .. } => self.obj(),
+            LeftBracket { .. } => self.arr(),
+            Token::String { val, .. } => {
                 let s = val.to_string();
                 self.str(s)
-            },
+            }
             Number { val, .. } => {
                 let n = *val;
                 self.num(n)
-            },
+            }
             Token::Bool { val, .. } => {
                 let b = *val;
                 self.boolean(b)
-            },
-            Token::Null {..} => self.null(),
+            }
+            Token::Null { .. } => self.null(),
             _ => {
                 let pos = token.pos();
                 self.err("Invalid Json".to_string(), pos)
@@ -53,7 +50,7 @@ impl <'a> Parser<'a> {
     fn obj(&mut self) -> Json {
         let mut m = HashMap::new();
 
-        if matches!(self.peek(), RightBrace{..}) {
+        if matches!(self.peek(), RightBrace { .. }) {
             self.advance();
             return Json::Obj(Box::new(m));
         }
@@ -61,16 +58,16 @@ impl <'a> Parser<'a> {
         loop {
             let (key, val) = match self.member() {
                 Ok((key, val)) => (key, val),
-                Err(e) => return Json::Err(e)
+                Err(e) => return Json::Err(e),
             };
             m.insert(key, val);
-            if !matches!(self.peek(), Comma{..}) {
+            if !matches!(self.peek(), Comma { .. }) {
                 break;
             }
             self.advance();
         }
 
-        if matches!(self.peek(), RightBrace{..}) {
+        if matches!(self.peek(), RightBrace { .. }) {
             self.advance();
             Json::Obj(Box::new(m))
         } else {
@@ -80,7 +77,7 @@ impl <'a> Parser<'a> {
     }
 
     fn arr(&mut self) -> Json {
-        if matches!(self.peek(), RightBracket{..}) {
+        if matches!(self.peek(), RightBracket { .. }) {
             self.advance();
             return Json::Arr(vec![]);
         }
@@ -88,12 +85,12 @@ impl <'a> Parser<'a> {
         let mut elements = Vec::new();
         elements.push(self.json());
 
-        while matches!(self.peek(), Comma{..}) {
+        while matches!(self.peek(), Comma { .. }) {
             self.advance();
             elements.push(self.json());
         }
-        
-        if matches!(self.peek(), RightBracket{..}) {
+
+        if matches!(self.peek(), RightBracket { .. }) {
             self.advance();
             Json::Arr(elements)
         } else {
@@ -104,24 +101,28 @@ impl <'a> Parser<'a> {
 
     fn member(&mut self) -> Result<(String, Json), Error> {
         let key = match &self.advance() {
-            Token::String { val, ..} => val.to_string(),
-            _ => return Err(Error {
-                message: "Invalid token: expected string".to_string(),
-                pos: self.peek().pos(),
-            })
+            Token::String { val, .. } => val.to_string(),
+            _ => {
+                return Err(Error {
+                    message: "Invalid token: expected string".to_string(),
+                    pos: self.peek().pos(),
+                })
+            }
         };
 
         let val = match self.advance() {
-            Colon{..} => self.json(),
-            _ => return Err(Error {
-                message: "Invalid token: expected ':'".to_string(),
-                pos: self.peek().pos(),
-            })
+            Colon { .. } => self.json(),
+            _ => {
+                return Err(Error {
+                    message: "Invalid token: expected ':'".to_string(),
+                    pos: self.peek().pos(),
+                })
+            }
         };
-        
+
         match val {
             Json::Err(e) => Err(e),
-            _ => Ok((key, val))
+            _ => Ok((key, val)),
         }
     }
 
@@ -142,10 +143,7 @@ impl <'a> Parser<'a> {
     }
 
     fn err(&mut self, message: String, pos: Pos) -> Json {
-        let e = Error {
-            message,
-            pos: pos,
-        };
+        let e = Error { message, pos: pos };
         Json::Err(e)
     }
 

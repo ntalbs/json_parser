@@ -1,10 +1,10 @@
-mod scanner;
-mod parser;
 mod construct;
+mod parser;
+mod scanner;
 
-use scanner::Scanner;
-use parser::Parser;
 use construct::Error;
+use parser::Parser;
+use scanner::Scanner;
 
 fn main() {
     let input = r#"
@@ -38,7 +38,7 @@ fn main() {
 
         for e in errors {
             println!("{} at {}", e.message, e.pos);
-            println!("{}", lines[e.pos.line-1]);
+            println!("{}", lines[e.pos.line - 1]);
             println!("{}^\n", " ".repeat(e.pos.col));
         }
     }
@@ -57,8 +57,8 @@ fn main() {
     };
 
     let mut parser = Parser::new(tokens);
-    let json = match  parser.parse() {
-        Ok(json) =>  json,
+    let json = match parser.parse() {
+        Ok(json) => json,
         Err(e) => {
             print_error(e);
             std::process::exit(1);

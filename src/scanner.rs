@@ -9,7 +9,7 @@ pub struct Scanner<'a> {
     pos: Pos,
 }
 
-impl <'a> Scanner<'a> {
+impl<'a> Scanner<'a> {
     pub fn new(input: &'a str) -> Self {
         Scanner {
             source: input,
@@ -17,7 +17,7 @@ impl <'a> Scanner<'a> {
             errors: Vec::new(),
             start: 0,
             current: 0,
-            pos: Pos { line: 1, col: 1 }
+            pos: Pos { line: 1, col: 1 },
         }
     }
 
@@ -39,40 +39,40 @@ impl <'a> Scanner<'a> {
         let o = self.advance();
         let c = match o {
             None => return,
-            Some(c) => c
+            Some(c) => c,
         };
         match c {
             '{' => self.add_token(Token::LeftBrace {
                 lexeme: "{",
-                pos: self.pos
+                pos: self.pos,
             }),
             '}' => self.add_token(Token::RightBrace {
                 lexeme: "}",
-                pos: self.pos
+                pos: self.pos,
             }),
             '[' => self.add_token(Token::LeftBracket {
                 lexeme: "[",
-                pos: self.pos
+                pos: self.pos,
             }),
             ']' => self.add_token(Token::RightBracket {
                 lexeme: "]",
-                pos: self.pos
+                pos: self.pos,
             }),
             ':' => self.add_token(Token::Colon {
                 lexeme: ":",
-                pos: self.pos
+                pos: self.pos,
             }),
             ',' => self.add_token(Token::Comma {
                 lexeme: ",",
-                pos: self.pos
+                pos: self.pos,
             }),
-            ' '|'\t' => {},
-            '\n'|'\r' => {
+            ' ' | '\t' => {}
+            '\n' | '\r' => {
                 self.pos.line += 1;
                 self.pos.col = 1;
             }
             '"' => self.string(),
-            '-'|'0'..='9' => self.number(),
+            '-' | '0'..='9' => self.number(),
             _ => {
                 if self.is_alpha(c) {
                     self.keyword();
@@ -89,8 +89,8 @@ impl <'a> Scanner<'a> {
 
     fn add_error(&mut self, message: String) {
         let e = Error {
-             message,
-             pos: self.pos,
+            message,
+            pos: self.pos,
         };
         self.errors.push(e);
     }
@@ -117,7 +117,7 @@ impl <'a> Scanner<'a> {
         } else {
             self.pos.col += 1;
             self.current += 1;
-            Some(self.source.chars().nth(self.current-1).unwrap())
+            Some(self.source.chars().nth(self.current - 1).unwrap())
         }
     }
 
@@ -144,19 +144,19 @@ impl <'a> Scanner<'a> {
                 Some('\n') | None => {
                     self.add_error("Unterminated string".to_string());
                     break;
-                },
+                }
                 Some(_) => {}
             }
             self.advance();
         }
 
         self.advance();
-        let lexeme = &self.source[self.start .. self.current]; 
-        let val= &self.source[self.start + 1 .. self.current - 1];
+        let lexeme = &self.source[self.start..self.current];
+        let val = &self.source[self.start + 1..self.current - 1];
         self.add_token(Token::String {
             lexeme,
             val,
-            pos: self.pos
+            pos: self.pos,
         });
     }
 
@@ -169,11 +169,13 @@ impl <'a> Scanner<'a> {
         self.digits();
 
         match (self.peek(), self.peek_next()) {
-            (Some('.'), Some(c)) => if self.is_digit(c) {
-                self.advance();
-                self.advance();
+            (Some('.'), Some(c)) => {
+                if self.is_digit(c) {
+                    self.advance();
+                    self.advance();
+                }
             }
-            _ => {},
+            _ => {}
         }
         self.digits();
 
@@ -182,18 +184,20 @@ impl <'a> Scanner<'a> {
         self.add_token(Token::Number {
             lexeme,
             val,
-            pos: self.pos
+            pos: self.pos,
         });
     }
 
     fn digits(&mut self) {
         loop {
             match self.peek() {
-                Some(c) => if self.is_digit(c) {
-                    self.advance();
-                } else {
-                    break;
-                },
+                Some(c) => {
+                    if self.is_digit(c) {
+                        self.advance();
+                    } else {
+                        break;
+                    }
+                }
                 _ => break,
             }
         }
@@ -202,11 +206,13 @@ impl <'a> Scanner<'a> {
     fn keyword(&mut self) {
         loop {
             match self.peek() {
-                Some(c) => if self.is_alnum(c) {
-                    self.advance();
-                } else {
-                    break;
-                },
+                Some(c) => {
+                    if self.is_alnum(c) {
+                        self.advance();
+                    } else {
+                        break;
+                    }
+                }
                 _ => break,
             }
         }
@@ -216,11 +222,11 @@ impl <'a> Scanner<'a> {
             "true" | "false" => self.add_token(Token::Bool {
                 lexeme,
                 val: lexeme.parse::<bool>().unwrap(),
-                pos: self.pos
+                pos: self.pos,
             }),
             "null" => self.add_token(Token::Null {
                 lexeme,
-                pos: self.pos
+                pos: self.pos,
             }),
             _ => {
                 let err_message = format!("{}: {}", "Unexpected token", lexeme);
