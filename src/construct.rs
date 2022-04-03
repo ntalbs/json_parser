@@ -57,7 +57,7 @@ pub enum Token<'a> {
         lexeme: &'a str,
         pos: Pos,
     },
-    EOF,
+    Eof,
 }
 
 impl<'a> Token<'a> {
@@ -99,7 +99,7 @@ impl<'a> Display for Token<'a> {
             Self::Null { lexeme, pos } => {
                 f.write_fmt(format_args!("'{}' => null at {}", lexeme, pos))
             }
-            Self::EOF => f.write_str("EOF"),
+            Self::Eof => f.write_str("EOF"),
         }
     }
 }
@@ -116,7 +116,7 @@ pub enum Json {
     Bool(bool),
     Num(f64),
     Str(String),
-    Obj(Box<HashMap<String, Json>>),
+    Obj(HashMap<String, Json>),
     Arr(Vec<Json>),
     Err(Error),
 }

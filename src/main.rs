@@ -30,7 +30,7 @@ fn main() {
         println!("{} at {}", e.message, e.pos);
     }
 
-    fn print_errors(errors: &Vec<Error>, input: &str) {
+    fn print_errors(errors: &[Error], input: &str) {
         let lines: Vec<&str> = input.lines().collect();
         for l in &lines {
             println!("|{}|", l);

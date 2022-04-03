@@ -26,7 +26,7 @@ impl<'a> Scanner<'a> {
             self.start = self.current;
             self.scan_token();
         }
-        self.add_token(Token::EOF);
+        self.add_token(Token::Eof);
 
         if self.errors.is_empty() {
             Result::Ok(&self.tokens)
@@ -168,15 +168,13 @@ impl<'a> Scanner<'a> {
 
         self.digits();
 
-        match (self.peek(), self.peek_next()) {
-            (Some('.'), Some(c)) => {
-                if self.is_digit(c) {
-                    self.advance();
-                    self.advance();
-                }
+        if let (Some('.'), Some(c)) = (self.peek(), self.peek_next()) {
+            if self.is_digit(c) {
+                self.advance();
+                self.advance();
             }
-            _ => {}
         }
+
         self.digits();
 
         let lexeme = &self.source[self.start..self.current];
@@ -189,31 +187,21 @@ impl<'a> Scanner<'a> {
     }
 
     fn digits(&mut self) {
-        loop {
-            match self.peek() {
-                Some(c) => {
-                    if self.is_digit(c) {
-                        self.advance();
-                    } else {
-                        break;
-                    }
-                }
-                _ => break,
+        while let Some(c) = self.peek() {
+            if self.is_digit(c) {
+                self.advance();
+            } else {
+                break;
             }
         }
     }
 
     fn keyword(&mut self) {
-        loop {
-            match self.peek() {
-                Some(c) => {
-                    if self.is_alnum(c) {
-                        self.advance();
-                    } else {
-                        break;
-                    }
-                }
-                _ => break,
+        while let Some(c) = self.peek() {
+            if self.is_alnum(c) {
+                self.advance();
+            } else {
+                break;
             }
         }
 

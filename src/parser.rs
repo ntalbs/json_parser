@@ -5,12 +5,12 @@ use crate::construct::Token::*;
 use crate::construct::{Error, Json, Pos, Token};
 
 pub struct Parser<'a> {
-    tokens: &'a Vec<Token<'a>>,
+    tokens: &'a [Token<'a>],
     current: usize,
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(tokens: &'a Vec<Token>) -> Self {
+    pub fn new(tokens: &'a [Token]) -> Self {
         Parser { tokens, current: 0 }
     }
 
@@ -52,7 +52,7 @@ impl<'a> Parser<'a> {
 
         if matches!(self.peek(), RightBrace { .. }) {
             self.advance();
-            return Json::Obj(Box::new(m));
+            return Json::Obj(m);
         }
 
         loop {
@@ -69,7 +69,7 @@ impl<'a> Parser<'a> {
 
         if matches!(self.peek(), RightBrace { .. }) {
             self.advance();
-            Json::Obj(Box::new(m))
+            Json::Obj(m)
         } else {
             let pos = self.peek().pos();
             self.err("Invalid token: expected '}'".to_string(), pos)
@@ -82,8 +82,7 @@ impl<'a> Parser<'a> {
             return Json::Arr(vec![]);
         }
 
-        let mut elements = Vec::new();
-        elements.push(self.json());
+        let mut elements = vec![self.json()];
 
         while matches!(self.peek(), Comma { .. }) {
             self.advance();
@@ -155,7 +154,7 @@ impl<'a> Parser<'a> {
     }
 
     fn is_at_end(&self) -> bool {
-        *self.peek() == Token::EOF
+        *self.peek() == Token::Eof
     }
 
     fn peek(&self) -> &Token {
