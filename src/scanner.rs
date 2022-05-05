@@ -29,7 +29,7 @@ impl<'a> Scanner<'a> {
         self.add_token(Token::Eof);
 
         if self.errors.is_empty() {
-            Result::Ok(&self.tokens)
+            Ok(&self.tokens)
         } else {
             Err(&self.errors)
         }
