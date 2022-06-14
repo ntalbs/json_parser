@@ -65,5 +65,6 @@ fn main() {
         }
     };
 
-    println!("{:?}", json);
+    println!("==================");
+    println!("{}", json);
 }
