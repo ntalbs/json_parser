@@ -1,4 +1,5 @@
-use std::{collections::HashMap, fmt::Display};
+use std::collections::BTreeMap;
+use std::fmt::Display;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Pos {
@@ -116,7 +117,7 @@ pub enum Json {
     Bool(bool),
     Num(f64),
     Str(String),
-    Obj(HashMap<String, Json>),
+    Obj(BTreeMap<String, Json>),
     Arr(Vec<Json>),
     Err(Error),
 }
@@ -133,7 +134,7 @@ impl Display for Json {
             let indent_first = tab.repeat(if is_under_key { 0 } else { level });
             let indent_body = tab.repeat(level + 1);
             let indent_last = tab.repeat(level);
-        
+
             match json {
                 Json::Null => f.write_fmt(format_args!("{indent_first}null,\n")),
                 Json::Bool(v) => f.write_fmt(format_args!("{indent_first}{},\n", v)),

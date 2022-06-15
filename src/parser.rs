@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::string::String;
 
 use crate::construct::Token::*;
@@ -48,7 +48,7 @@ impl<'a> Parser<'a> {
     }
 
     fn obj(&mut self) -> Json {
-        let mut m = HashMap::new();
+        let mut m = BTreeMap::new();
 
         if matches!(self.peek(), RightBrace { .. }) {
             self.advance();
