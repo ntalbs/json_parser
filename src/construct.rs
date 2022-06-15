@@ -127,12 +127,17 @@ impl Display for Json {
     }
 }
 
-fn fmt_level(f: &mut std::fmt::Formatter<'_>, json: &Json, level: usize, is_under_key: bool) -> std::fmt::Result {
+fn fmt_level(
+    f: &mut std::fmt::Formatter<'_>,
+    json: &Json,
+    level: usize,
+    is_under_key: bool,
+) -> std::fmt::Result {
     let tab: &str = "  ";
     let indent_first = tab.repeat(if is_under_key { 0 } else { level });
     let indent_body = tab.repeat(level + 1);
     let indent_last = tab.repeat(level);
-    
+
     match json {
         Json::Null => f.write_fmt(format_args!("{indent_first}null,\n")),
         Json::Bool(v) => f.write_fmt(format_args!("{indent_first}{},\n", v)),
@@ -145,7 +150,7 @@ fn fmt_level(f: &mut std::fmt::Formatter<'_>, json: &Json, level: usize, is_unde
                 fmt_level(f, v, level + 1, true)?;
             }
             f.write_fmt(format_args!("{indent_last}}},\n"))
-        },
+        }
         Json::Arr(arr) => {
             f.write_fmt(format_args!("{indent_first}[\n"))?;
             for e in arr {
@@ -153,8 +158,6 @@ fn fmt_level(f: &mut std::fmt::Formatter<'_>, json: &Json, level: usize, is_unde
             }
             f.write_fmt(format_args!("{indent_last}],\n"))
         }
-        Json::Err(e) => {
-            f.write_fmt(format_args!("Error: {} at {}", e.message, e.pos))
-        }
+        Json::Err(e) => f.write_fmt(format_args!("Error: {} at {}", e.message, e.pos)),
     }
 }
