@@ -147,7 +147,7 @@ impl Display for Json {
                         if !is_first {
                             f.write_str(",\n")?;
                         }
-                        f.write_fmt(format_args!("{indent_body}{k}: "))?;
+                        f.write_fmt(format_args!("{indent_body}\"{k}\": "))?;
                         fmt_level(f, v, level + 1, true)?;
                         is_first = false;
                     }
