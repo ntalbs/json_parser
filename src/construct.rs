@@ -136,24 +136,34 @@ impl Display for Json {
             let indent_last = tab.repeat(level);
 
             match json {
-                Json::Null => f.write_fmt(format_args!("{indent_first}null,\n")),
-                Json::Bool(v) => f.write_fmt(format_args!("{indent_first}{},\n", v)),
-                Json::Num(v) => f.write_fmt(format_args!("{indent_first}{},\n", v)),
-                Json::Str(v) => f.write_fmt(format_args!("\"{indent_first}{}\",\n", v)),
+                Json::Null => f.write_fmt(format_args!("{indent_first}null")),
+                Json::Bool(v) => f.write_fmt(format_args!("{indent_first}{}", v)),
+                Json::Num(v) => f.write_fmt(format_args!("{indent_first}{}", v)),
+                Json::Str(v) => f.write_fmt(format_args!("\"{indent_first}{}\"", v)),
                 Json::Obj(m) => {
+                    let mut is_first = true;
                     f.write_fmt(format_args!("{indent_first}{{\n"))?;
                     for (k, v) in m {
-                        f.write_fmt(format_args!("{indent_body}{}: ", k))?;
+                        if !is_first {
+                            f.write_str(",\n")?;
+                        }
+                        f.write_fmt(format_args!("{indent_body}{k}: "))?;
                         fmt_level(f, v, level + 1, true)?;
+                        is_first = false;
                     }
-                    f.write_fmt(format_args!("{indent_last}}},\n"))
+                    f.write_fmt(format_args!("\n{indent_last}}}"))
                 }
                 Json::Arr(arr) => {
+                    let mut is_first = true;
                     f.write_fmt(format_args!("{indent_first}[\n"))?;
                     for e in arr {
+                        if !is_first {
+                            f.write_str(",\n")?;
+                        }
                         fmt_level(f, e, level + 1, false)?;
+                        is_first = false;
                     }
-                    f.write_fmt(format_args!("{indent_last}],\n"))
+                    f.write_fmt(format_args!("\n{indent_last}]"))
                 }
                 Json::Err(e) => f.write_fmt(format_args!("Error: {} at {}", e.message, e.pos)),
             }
