@@ -124,47 +124,78 @@ pub enum Json {
 
 impl Display for Json {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        const TAB: &str = "  ";
+        fn indent_first(level: usize, is_under_key: bool) -> String {
+            TAB.repeat(if is_under_key { 0 } else { level })
+        }
+
+        fn indent_body(level: usize) -> String {
+            TAB.repeat(level + 1)
+        }
+
+        fn indent_last(level: usize) -> String {
+            TAB.repeat(level)
+        }
+
+        fn fmt_object(
+            f: &mut std::fmt::Formatter<'_>,
+            obj: &BTreeMap<String, Json>,
+            level: usize,
+            is_under_key: bool,
+        ) -> std::fmt::Result {
+            let indent_first = indent_first(level, is_under_key);
+            let indent_body = indent_body(level);
+            let indent_last = indent_last(level);
+
+            let mut is_first = true;
+            f.write_fmt(format_args!("{indent_first}{{\n"))?;
+            for (k, v) in obj {
+                if !is_first {
+                    f.write_str(",\n")?;
+                }
+                f.write_fmt(format_args!("{indent_body}\"{k}\": "))?;
+                fmt_level(f, v, level + 1, true)?;
+                is_first = false;
+            }
+            f.write_fmt(format_args!("\n{indent_last}}}"))
+        }
+
+        fn fmt_array(
+            f: &mut std::fmt::Formatter<'_>,
+            arr: &[Json],
+            level: usize,
+            is_under_key: bool,
+        ) -> std::fmt::Result {
+            let indent_first = indent_first(level, is_under_key);
+            let indent_last = indent_last(level);
+
+            let mut is_first = true;
+            f.write_fmt(format_args!("{indent_first}[\n"))?;
+            for e in arr {
+                if !is_first {
+                    f.write_str(",\n")?;
+                }
+                fmt_level(f, e, level + 1, false)?;
+                is_first = false;
+            }
+            f.write_fmt(format_args!("\n{indent_last}]"))
+        }
+
         fn fmt_level(
             f: &mut std::fmt::Formatter<'_>,
             json: &Json,
             level: usize,
             is_under_key: bool,
         ) -> std::fmt::Result {
-            let tab = "  ";
-            let indent_first = tab.repeat(if is_under_key { 0 } else { level });
-            let indent_body = tab.repeat(level + 1);
-            let indent_last = tab.repeat(level);
+            let indent_first = indent_first(level, is_under_key);
 
             match json {
                 Json::Null => f.write_fmt(format_args!("{indent_first}null")),
                 Json::Bool(v) => f.write_fmt(format_args!("{indent_first}{}", v)),
                 Json::Num(v) => f.write_fmt(format_args!("{indent_first}{}", v)),
                 Json::Str(v) => f.write_fmt(format_args!("\"{indent_first}{}\"", v)),
-                Json::Obj(m) => {
-                    let mut is_first = true;
-                    f.write_fmt(format_args!("{indent_first}{{\n"))?;
-                    for (k, v) in m {
-                        if !is_first {
-                            f.write_str(",\n")?;
-                        }
-                        f.write_fmt(format_args!("{indent_body}\"{k}\": "))?;
-                        fmt_level(f, v, level + 1, true)?;
-                        is_first = false;
-                    }
-                    f.write_fmt(format_args!("\n{indent_last}}}"))
-                }
-                Json::Arr(arr) => {
-                    let mut is_first = true;
-                    f.write_fmt(format_args!("{indent_first}[\n"))?;
-                    for e in arr {
-                        if !is_first {
-                            f.write_str(",\n")?;
-                        }
-                        fmt_level(f, e, level + 1, false)?;
-                        is_first = false;
-                    }
-                    f.write_fmt(format_args!("\n{indent_last}]"))
-                }
+                Json::Obj(m) => fmt_object(f, m, level, is_under_key),
+                Json::Arr(arr) => fmt_array(f, arr, level, is_under_key),
                 Json::Err(e) => f.write_fmt(format_args!("Error: {} at {}", e.message, e.pos)),
             }
         }
