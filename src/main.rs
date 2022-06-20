@@ -20,7 +20,9 @@ fn main() {
         "f": [
             {"a": 10},
             {"a": 20}
-        ]
+        ],
+        "empty_array": [],
+        "empty_object": {}
     }
     "#;
 
