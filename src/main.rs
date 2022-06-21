@@ -21,8 +21,10 @@ fn main() {
             {"a": 10},
             {"a": 20}
         ],
-        "empty_array": [],
-        "empty_object": {}
+        "array_empty": [],
+        "array_one": ["hello"],
+        "object_empty": {},
+        "object_one": {"hello": "world"}
     }
     "#;
 
