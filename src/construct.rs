@@ -169,16 +169,18 @@ impl Display for Json {
             let indent_first = indent_first(level, is_under_key);
             let indent_last = indent_last(level);
 
-            let mut is_first = true;
-            f.write_fmt(format_args!("{indent_first}[\n"))?;
-            for e in arr {
-                if !is_first {
-                    f.write_str(",\n")?;
+            match arr {
+                [] => f.write_fmt(format_args!("{indent_first}[]")),
+                [h, tail @ ..] => {
+                    f.write_fmt(format_args!("{indent_first}[\n"))?;
+                    fmt_level(f, h, level + 1, false)?;
+                    for e in tail {
+                        f.write_str(",\n")?;
+                        fmt_level(f, e, level + 1, false)?;
+                    }
+                    f.write_fmt(format_args!("\n{indent_last}]"))
                 }
-                fmt_level(f, e, level + 1, false)?;
-                is_first = false;
             }
-            f.write_fmt(format_args!("\n{indent_last}]"))
         }
 
         fn fmt_level(
