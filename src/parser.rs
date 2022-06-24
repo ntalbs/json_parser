@@ -1,4 +1,3 @@
-use std::collections::BTreeMap;
 use std::string::String;
 
 use crate::construct::Token::*;
@@ -48,7 +47,7 @@ impl<'a> Parser<'a> {
     }
 
     fn obj(&mut self) -> Json {
-        let mut m = BTreeMap::new();
+        let mut m: Vec<(String, Json)> = Vec::new();
 
         if matches!(self.peek(), RightBrace { .. }) {
             self.advance();
@@ -60,7 +59,7 @@ impl<'a> Parser<'a> {
                 Ok((key, val)) => (key, val),
                 Err(e) => return Json::Err(e),
             };
-            m.insert(key, val);
+            m.push((key, val));
             if !matches!(self.peek(), Comma { .. }) {
                 break;
             }

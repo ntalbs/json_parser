@@ -1,4 +1,3 @@
-use std::collections::BTreeMap;
 use std::fmt::Display;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -117,7 +116,7 @@ pub enum Json {
     Bool(bool),
     Num(f64),
     Str(String),
-    Obj(BTreeMap<String, Json>),
+    Obj(Vec<(String, Json)>),
     Arr(Vec<Json>),
     Err(Error),
 }
@@ -139,7 +138,7 @@ impl Display for Json {
 
         fn fmt_object(
             f: &mut std::fmt::Formatter<'_>,
-            obj: &BTreeMap<String, Json>,
+            obj: &Vec<(String, Json)>,
             level: usize,
             is_under_key: bool,
         ) -> std::fmt::Result {
