@@ -138,7 +138,7 @@ impl Display for Json {
 
         fn fmt_object(
             f: &mut std::fmt::Formatter<'_>,
-            obj: &Vec<(String, Json)>,
+            obj: &[(String, Json)],
             level: usize,
             is_under_key: bool,
         ) -> std::fmt::Result {
@@ -146,17 +146,20 @@ impl Display for Json {
             let indent_body = indent_body(level);
             let indent_last = indent_last(level);
 
-            let mut is_first = true;
-            f.write_fmt(format_args!("{indent_first}{{\n"))?;
-            for (k, v) in obj {
-                if !is_first {
-                    f.write_str(",\n")?;
+            match obj {
+                [] => f.write_fmt(format_args!("{indent_first}{{}}")),
+                [h, tail @ ..] => {
+                    f.write_fmt(format_args!("{indent_first}{{\n"))?;
+                    let (k, v) = h;
+                    f.write_fmt(format_args!("{indent_body}\"{k}\": "))?;
+                    fmt_level(f, v, level + 1, true)?;
+                    for (k, v) in tail {
+                        f.write_fmt(format_args!(",\n{indent_body}\"{k}\": "))?;
+                        fmt_level(f, v, level + 1, true)?;
+                    }
+                    f.write_fmt(format_args!("\n{indent_last}}}"))
                 }
-                f.write_fmt(format_args!("{indent_body}\"{k}\": "))?;
-                fmt_level(f, v, level + 1, true)?;
-                is_first = false;
             }
-            f.write_fmt(format_args!("\n{indent_last}}}"))
         }
 
         fn fmt_array(
