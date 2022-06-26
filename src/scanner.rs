@@ -21,7 +21,7 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, &Vec<Error>> {
+    pub fn scan_tokens(&mut self) -> Result<&[Token], &[Error]> {
         while !self.is_at_end() {
             self.start = self.current;
             self.scan_token();
