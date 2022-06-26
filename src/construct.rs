@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+use crate::{parser::Parser, scanner::Scanner};
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Pos {
     pub line: usize,
@@ -104,7 +106,7 @@ impl<'a> Display for Token<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Error {
     pub message: String,
     pub pos: Pos,
@@ -118,7 +120,27 @@ pub enum Json {
     Str(String),
     Obj(Vec<(String, Json)>),
     Arr(Vec<Json>),
-    Err(Error),
+}
+
+impl Json {
+    pub fn from_str(s: &str) -> Result<Self, Vec<Error>> {
+        let mut scanner = Scanner::new(s);
+        let tokens = match scanner.scan_tokens() {
+            Ok(tokens) => {
+                for t in tokens {
+                    println!("{}", t);
+                }
+                tokens
+            }
+            Err(errors) => return Err(errors.to_vec())
+        };
+
+        let mut parser = Parser::new(&tokens);
+        match parser.parse() {
+            Ok(json) => Ok(json),
+            Err(error) => Err(vec![error]),
+        }
+    }
 }
 
 impl Display for Json {
@@ -200,7 +222,12 @@ impl Display for Json {
                 Json::Str(v) => f.write_fmt(format_args!("{indent_first}\"{}\"", v)),
                 Json::Obj(m) => fmt_object(f, m, level, is_under_key),
                 Json::Arr(arr) => fmt_array(f, arr, level, is_under_key),
-                Json::Err(e) => f.write_fmt(format_args!("Error: {} at {}", e.message, e.pos)),
+                // Json::Err(errors) => {
+                //     for e in errors {
+                //         f.write_fmt(format_args!("Error: {} at {}", e.message, e.pos))?;
+                //     }
+                //     f.write_str("Errors while parsing JSON")
+                // }
             }
         }
 
