@@ -5,19 +5,26 @@ use crate::construct::{Error, Json, Pos, Token};
 
 pub struct Parser<'a> {
     tokens: &'a [Token<'a>],
+    errors: Vec<Error>,
     current: usize,
 }
 
 impl<'a> Parser<'a> {
     pub fn new(tokens: &'a [Token]) -> Self {
-        Parser { tokens, current: 0 }
+        Parser { 
+            tokens,
+            errors: Vec::new(),
+            current: 0,
+        }
     }
 
-    pub fn parse(&mut self) -> Result<Json, Error> {
+    pub fn parse(&mut self) -> Result<Json, Vec<Error>> {
         let json = self.json();
-        match json {
-            Json::Err(e) => Err(e),
-            _ => Ok(json),
+
+        if self.errors.is_empty() {
+            Ok(json)
+        } else {
+            Err(self.errors)
         }
     }
 
@@ -48,6 +55,7 @@ impl<'a> Parser<'a> {
 
     fn obj(&mut self) -> Json {
         let mut m: Vec<(String, Json)> = Vec::new();
+        let mut errors: Vec<Error> = Vec::new();
 
         if matches!(self.peek(), RightBrace { .. }) {
             self.advance();
@@ -55,11 +63,12 @@ impl<'a> Parser<'a> {
         }
 
         loop {
-            let (key, val) = match self.member() {
-                Ok((key, val)) => (key, val),
-                Err(e) => return Json::Err(e),
+            match self.member() {
+                Ok((key, val)) => m.push((key, val)),
+                Err(errs) => for e in errs {
+                    errors.push(e);
+                }
             };
-            m.push((key, val));
             if !matches!(self.peek(), Comma { .. }) {
                 break;
             }
@@ -71,7 +80,11 @@ impl<'a> Parser<'a> {
             Json::Obj(m)
         } else {
             let pos = self.peek().pos();
-            self.err("Invalid token: expected '}'".to_string(), pos)
+            errors.push(Error {
+                message: "Invalid token: expected '}'".to_string(),
+                pos
+            });
+            Json::Err(errors)
         }
     }
 
@@ -82,6 +95,7 @@ impl<'a> Parser<'a> {
         }
 
         let mut elements = vec![self.json()];
+        //let mut errors: Vec<Error> = Vec::new();
 
         while matches!(self.peek(), Comma { .. }) {
             self.advance();
@@ -97,29 +111,29 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn member(&mut self) -> Result<(String, Json), Error> {
+    fn member(&mut self) -> Result<(String, Json), Vec<Error>> {
         let key = match &self.advance() {
             Token::String { val, .. } => val.to_string(),
             _ => {
-                return Err(Error {
+                return Err(vec![Error {
                     message: "Invalid token: expected string".to_string(),
                     pos: self.peek().pos(),
-                })
+                }])
             }
         };
 
         let val = match self.advance() {
             Colon { .. } => self.json(),
             _ => {
-                return Err(Error {
+                return Err(vec![Error {
                     message: "Invalid token: expected ':'".to_string(),
                     pos: self.peek().pos(),
-                })
+                }])
             }
         };
 
         match val {
-            Json::Err(e) => Err(e),
+            Json::Err(errors) => Err(errors),
             _ => Ok((key, val)),
         }
     }
@@ -142,7 +156,7 @@ impl<'a> Parser<'a> {
 
     fn err(&mut self, message: String, pos: Pos) -> Json {
         let e = Error { message, pos };
-        Json::Err(e)
+        Json::Err(vec![e])
     }
 
     fn advance(&mut self) -> &Token {

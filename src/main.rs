@@ -30,10 +30,6 @@ fn main() {
 
     let mut scanner = Scanner::new(input);
 
-    fn print_error(e: Error) {
-        println!("{} at {}", e.message, e.pos);
-    }
-
     fn print_errors(errors: &[Error], input: &str) {
         let lines: Vec<&str> = input.lines().collect();
         for l in &lines {
@@ -55,16 +51,16 @@ fn main() {
             tokens
         }
         Err(errors) => {
-            print_errors(errors, input);
+            print_errors(&errors, input);
             std::process::exit(1);
         }
     };
 
-    let mut parser = Parser::new(tokens);
+    let mut parser = Parser::new(&tokens);
     let json = match parser.parse() {
         Ok(json) => json,
-        Err(e) => {
-            print_error(e);
+        Err(errors) => {
+            print_errors(&errors, input);
             std::process::exit(1);
         }
     };
