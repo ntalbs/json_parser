@@ -222,12 +222,6 @@ impl Display for Json {
                 Json::Str(v) => f.write_fmt(format_args!("{indent_first}\"{}\"", v)),
                 Json::Obj(m) => fmt_object(f, m, level, is_under_key),
                 Json::Arr(arr) => fmt_array(f, arr, level, is_under_key),
-                // Json::Err(errors) => {
-                //     for e in errors {
-                //         f.write_fmt(format_args!("Error: {} at {}", e.message, e.pos))?;
-                //     }
-                //     f.write_str("Errors while parsing JSON")
-                // }
             }
         }
 

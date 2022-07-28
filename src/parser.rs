@@ -155,11 +155,6 @@ impl<'a> Parser<'a> {
         Json::Null
     }
 
-    // fn err(&mut self, message: String, pos: Pos) -> Json {
-    //     let e = Error { message, pos };
-    //     Json::Err(vec![e])
-    // }
-
     fn advance(&mut self) -> &Token {
         if !self.is_at_end() {
             self.current += 1;
