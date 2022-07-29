@@ -112,7 +112,7 @@ pub struct Error {
     pub pos: Pos,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Json {
     Null,
     Bool(bool),
@@ -227,4 +227,53 @@ impl Display for Json {
 
         fmt_level(f, self, 0, false)
     }
+}
+
+#[test]
+fn test_json_literals() {
+    let json = Json::from_str("null").unwrap();
+    assert_eq!(json, Json::Null);
+    let json = Json::from_str("true").unwrap();
+    assert_eq!(json, Json::Bool(true));
+    let json = Json::from_str("false").unwrap();
+    assert_eq!(json, Json::Bool(false));
+    let json = Json::from_str("123.45").unwrap();
+    assert_eq!(json, Json::Num(123.45));
+    let json = Json::from_str("\"abc\"").unwrap();
+    assert_eq!(json, Json::Str("abc".to_string()));
+}
+
+#[test]
+fn test_json_empty() {
+    let json = Json::from_str("{}").unwrap();
+    assert_eq!(json, Json::Obj(vec![]));
+    let json = Json::from_str("[]").unwrap();
+    assert_eq!(json, Json::Arr(vec![]));
+}
+
+#[test]
+fn test_json_obj() {
+    let input = r#"{"a": 1, "b": 2}"#;
+    let json = Json::from_str(input).unwrap();
+    assert_eq!(
+        json,
+        Json::Obj(vec![
+            ("a".to_string(), Json::Num(1.0)),
+            ("b".to_string(), Json::Num(2.0)),
+        ])
+    );
+}
+
+#[test]
+fn test_json_arr() {
+    let input = r#"[1, 2, 3]"#;
+    let json = Json::from_str(input).unwrap();
+    assert_eq!(
+        json,
+        Json::Arr(vec![
+            Json::Num(1.0),
+            Json::Num(2.0),
+            Json::Num(3.0),
+        ])
+    );
 }
