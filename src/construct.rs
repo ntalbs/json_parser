@@ -277,3 +277,14 @@ fn test_json_arr() {
         ])
     );
 }
+
+#[test]
+fn test_nested_empty_arr() {
+    let input = r#"[[]]"#;
+    let json = Json::from_str(input).unwrap();
+    assert_eq!(
+        json,
+        Json::Arr(vec![Json::Arr(vec![])])
+    );
+}
+
