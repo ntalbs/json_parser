@@ -100,7 +100,7 @@ impl<'a> Scanner<'a> {
     }
 
     fn is_digit(&self, c: char) -> bool {
-        c.is_digit(10)
+        c.is_ascii_digit()
     }
 
     fn is_alpha(&self, c: char) -> bool {

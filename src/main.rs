@@ -2,7 +2,7 @@ mod construct;
 mod parser;
 mod scanner;
 
-use crate::construct::{Json, Error};
+use crate::construct::{Error, Json};
 
 fn main() {
     let input = r#"

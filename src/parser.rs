@@ -10,10 +10,7 @@ pub struct Parser<'a> {
 
 impl<'a> Parser<'a> {
     pub fn new(tokens: &'a [Token]) -> Self {
-        Parser { 
-            tokens,
-            current: 0,
-        }
+        Parser { tokens, current: 0 }
     }
 
     pub fn parse(&mut self) -> Result<Json, Error> {
@@ -42,7 +39,7 @@ impl<'a> Parser<'a> {
                 let pos = token.pos();
                 Err(Error {
                     message: "Invalid Json".to_string(),
-                    pos
+                    pos,
                 })
             }
         }
@@ -76,13 +73,13 @@ impl<'a> Parser<'a> {
             // errors???
             Err(Error {
                 message: "Invalid token: expected '}'".to_string(),
-                pos
+                pos,
             })
         }
     }
 
     fn arr(&mut self) -> Result<Json, Error> {
-        let mut elements:Vec<Json> = Vec::new();
+        let mut elements: Vec<Json> = Vec::new();
         if matches!(self.peek(), RightBracket { .. }) {
             self.advance();
             return Ok(Json::Arr(elements));
@@ -107,7 +104,7 @@ impl<'a> Parser<'a> {
             let pos = self.peek().pos();
             Err(Error {
                 message: "Invalid token: expected ']'".to_string(),
-                pos
+                pos,
             })
         }
     }

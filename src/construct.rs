@@ -132,10 +132,10 @@ impl Json {
                 }
                 tokens
             }
-            Err(errors) => return Err(errors.to_vec())
+            Err(errors) => return Err(errors.to_vec()),
         };
 
-        let mut parser = Parser::new(&tokens);
+        let mut parser = Parser::new(tokens);
         match parser.parse() {
             Ok(json) => Ok(json),
             Err(error) => Err(vec![error]),
@@ -270,11 +270,7 @@ fn test_json_arr() {
     let json = Json::from_str(input).unwrap();
     assert_eq!(
         json,
-        Json::Arr(vec![
-            Json::Num(1.0),
-            Json::Num(2.0),
-            Json::Num(3.0),
-        ])
+        Json::Arr(vec![Json::Num(1.0), Json::Num(2.0), Json::Num(3.0),])
     );
 }
 
