@@ -29,7 +29,7 @@ fn main() {
     fn print_errors(errors: Vec<Error>, input: &str) {
         let lines: Vec<&str> = input.lines().collect();
         for l in &lines {
-            println!("|{}|", l);
+            println!("|{l}|");
         }
 
         for e in &errors {
@@ -40,7 +40,7 @@ fn main() {
     }
 
     match Json::from_str(input) {
-        Ok(json) => println!("{}", json),
+        Ok(json) => println!("{json}"),
         Err(errors) => {
             print_errors(errors, input);
         }

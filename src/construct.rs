@@ -88,18 +88,18 @@ impl<'a> Display for Token<'a> {
             | Self::LeftBracket { lexeme, pos }
             | Self::RightBracket { lexeme, pos }
             | Self::Colon { lexeme, pos }
-            | Self::Comma { lexeme, pos } => f.write_fmt(format_args!("'{}' at {}", lexeme, pos)),
+            | Self::Comma { lexeme, pos } => f.write_fmt(format_args!("'{lexeme}' at {pos}")),
             Self::String { lexeme, pos, val } => {
-                f.write_fmt(format_args!("'{}' => \"{}\" at {}", lexeme, val, pos))
+                f.write_fmt(format_args!("'{lexeme}' => \"{val}\" at {pos}"))
             }
             Self::Number { lexeme, pos, val } => {
-                f.write_fmt(format_args!("'{}' => {} at {}", lexeme, val, pos))
+                f.write_fmt(format_args!("'{lexeme}' => {val} at {pos}"))
             }
             Self::Bool { lexeme, pos, val } => {
-                f.write_fmt(format_args!("'{}' => {} at {}", lexeme, val, pos))
+                f.write_fmt(format_args!("'{lexeme}' => {val} at {pos}"))
             }
             Self::Null { lexeme, pos } => {
-                f.write_fmt(format_args!("'{}' => null at {}", lexeme, pos))
+                f.write_fmt(format_args!("'{lexeme}' => null at {pos}"))
             }
             Self::Eof => f.write_str("EOF"),
         }
@@ -128,7 +128,7 @@ impl Json {
         let tokens = match scanner.scan_tokens() {
             Ok(tokens) => {
                 for t in tokens {
-                    println!("{}", t);
+                    println!("{t}");
                 }
                 tokens
             }
@@ -217,9 +217,9 @@ impl Display for Json {
 
             match json {
                 Json::Null => f.write_fmt(format_args!("{indent_first}null")),
-                Json::Bool(v) => f.write_fmt(format_args!("{indent_first}{}", v)),
-                Json::Num(v) => f.write_fmt(format_args!("{indent_first}{}", v)),
-                Json::Str(v) => f.write_fmt(format_args!("{indent_first}\"{}\"", v)),
+                Json::Bool(v) => f.write_fmt(format_args!("{indent_first}{v}")),
+                Json::Num(v) => f.write_fmt(format_args!("{indent_first}{v}")),
+                Json::Str(v) => f.write_fmt(format_args!("{indent_first}\"{v}\"")),
                 Json::Obj(m) => fmt_object(f, m, level, is_under_key),
                 Json::Arr(arr) => fmt_array(f, arr, level, is_under_key),
             }
