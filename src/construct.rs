@@ -98,9 +98,7 @@ impl<'a> Display for Token<'a> {
             Self::Bool { lexeme, pos, val } => {
                 f.write_fmt(format_args!("'{lexeme}' => {val} at {pos}"))
             }
-            Self::Null { lexeme, pos } => {
-                f.write_fmt(format_args!("'{lexeme}' => null at {pos}"))
-            }
+            Self::Null { lexeme, pos } => f.write_fmt(format_args!("'{lexeme}' => null at {pos}")),
             Self::Eof => f.write_str("EOF"),
         }
     }
