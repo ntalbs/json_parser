@@ -2,7 +2,7 @@ mod parser;
 mod scanner;
 mod token;
 
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
 use parser::Parser;
 use scanner::Scanner;
@@ -36,8 +36,10 @@ pub enum Json {
     Arr(Vec<Json>),
 }
 
-impl Json {
-    pub fn from_str(s: &str) -> Result<Self, Vec<Error>> {
+impl FromStr for Json {
+    type Err = Vec<Error>;
+
+    fn from_str(s: &str) -> Result<Self, Vec<Error>> {
         let mut scanner = Scanner::new(s);
         let tokens = match scanner.scan_tokens() {
             Ok(tokens) => {

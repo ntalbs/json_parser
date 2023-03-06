@@ -1,3 +1,4 @@
+use std::str::FromStr;
 use json_parser::{Error, Json};
 
 fn main() {
