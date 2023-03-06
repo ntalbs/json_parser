@@ -1,19 +1,19 @@
 use std::string::String;
 
-use crate::construct::Token::*;
-use crate::construct::{Error, Json, Token};
+use crate::Token::*;
+use crate::{Error, Json, Token};
 
-pub struct Parser<'a> {
+pub(crate) struct Parser<'a> {
     tokens: &'a [Token<'a>],
     current: usize,
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(tokens: &'a [Token]) -> Self {
+    pub(crate) fn new(tokens: &'a [Token]) -> Self {
         Parser { tokens, current: 0 }
     }
 
-    pub fn parse(&mut self) -> Result<Json, Error> {
+    pub(crate) fn parse(&mut self) -> Result<Json, Error> {
         self.json()
     }
 

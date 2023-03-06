@@ -1,8 +1,4 @@
-mod construct;
-mod parser;
-mod scanner;
-
-use crate::construct::{Error, Json};
+use json_parser::{Error, Json};
 
 fn main() {
     let input = r#"

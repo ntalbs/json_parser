@@ -1,6 +1,6 @@
-use crate::construct::{Error, Pos, Token};
+use crate::{Error, Pos, Token};
 
-pub struct Scanner<'a> {
+pub(crate) struct Scanner<'a> {
     source: &'a str,
     tokens: Vec<Token<'a>>,
     errors: Vec<Error>,
@@ -10,7 +10,7 @@ pub struct Scanner<'a> {
 }
 
 impl<'a> Scanner<'a> {
-    pub fn new(input: &'a str) -> Self {
+    pub(crate) fn new(input: &'a str) -> Self {
         Scanner {
             source: input,
             tokens: Vec::new(),
@@ -21,7 +21,7 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    pub fn scan_tokens(&mut self) -> Result<&[Token], &[Error]> {
+    pub(crate) fn scan_tokens(&mut self) -> Result<&[Token], &[Error]> {
         while !self.is_at_end() {
             self.start = self.current;
             self.scan_token();
