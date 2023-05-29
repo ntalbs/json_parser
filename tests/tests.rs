@@ -1,5 +1,5 @@
-use std::str::FromStr;
 use json_parser::Json;
+use std::str::FromStr;
 
 #[test]
 fn test_json_literals() {

@@ -1,5 +1,5 @@
-use std::str::FromStr;
 use json_parser::{Error, Json};
+use std::str::FromStr;
 
 fn main() {
     let input = r#"
