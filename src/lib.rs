@@ -2,7 +2,7 @@ mod parser;
 mod scanner;
 mod token;
 
-use std::{fmt::Display, str::FromStr};
+use std::{fmt::Display, str::FromStr, collections::HashMap};
 
 use parser::Parser;
 use scanner::Scanner;
@@ -40,12 +40,27 @@ impl FromStr for Json {
     type Err = Vec<Error>;
 
     fn from_str(s: &str) -> Result<Self, Vec<Error>> {
+        let mut line_map: HashMap<usize, &str> = HashMap::new();
+        for line in s.lines().enumerate() {
+            line_map.insert(line.0 + 1, line.1);
+        }
+
         let mut scanner = Scanner::new(s);
         let tokens = match scanner.scan_tokens() {
             Ok(tokens) => {
+                println!(">>> Tokens:");
                 for t in tokens {
+                    match t {
+                        Token::Eof => break,
+                        _ => {}
+                    }
+                    let line = line_map.get(&t.pos().line).unwrap();
+                    let col = t.pos().col;
                     println!("{t}");
+                    println!("{:>6} | {}", t.pos().line, line);
+                    println!("        {}^", " ".repeat(col));
                 }
+                println!(">>>");
                 tokens
             }
             Err(errors) => return Err(errors.to_vec()),
