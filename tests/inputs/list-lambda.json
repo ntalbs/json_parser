@@ -1,0 +1,68 @@
+{
+    "Functions": [
+        {
+            "FunctionName": "TweetbookStack-CustomCDKBucketDeployment8693BB6496-SL8N8LqM7808",
+            "FunctionArn": "arn:aws:lambda:eu-west-1:864661773271:function:TweetbookStack-CustomCDKBucketDeployment8693BB6496-SL8N8LqM7808",
+            "Runtime": "python3.7",
+            "Role": "arn:aws:iam::864661773271:role/TweetbookStack-CustomCDKBucketDeployment8693BB6496-9RPYM7AWWOGD",
+            "Handler": "index.handler",
+            "CodeSize": 4279,
+            "Description": "",
+            "Timeout": 900,
+            "MemorySize": 128,
+            "LastModified": "2022-10-06T19:07:21.336+0000",
+            "CodeSha256": "BBknNrz24IzJuS/KQXawzM/Wm7as1bwbfxscXhrY4Ho=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "9a31ffc5-2c54-4ea4-9320-f7b220497600",
+            "Layers": [
+                {
+                    "Arn": "arn:aws:lambda:eu-west-1:864661773271:layer:DeployHtmlAwsCliLayer9F9F2C78:1",
+                    "CodeSize": 13553406
+                }
+            ],
+            "PackageType": "Zip",
+            "Architectures": [
+                "x86_64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            },
+            "SnapStart": {
+                "ApplyOn": "None",
+                "OptimizationStatus": "Off"
+            }
+        },
+        {
+            "FunctionName": "Tweetbook-Tweet",
+            "FunctionArn": "arn:aws:lambda:eu-west-1:864661773271:function:Tweetbook-Tweet",
+            "Runtime": "nodejs16.x",
+            "Role": "arn:aws:iam::864661773271:role/TweetbookStack-TweetbookTweetServiceRole0E634880-1PACLVER7U971",
+            "Handler": "index.handler",
+            "CodeSize": 2106607,
+            "Description": "",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "LastModified": "2022-10-06T19:08:32.721+0000",
+            "CodeSha256": "0e2AAv8cklSJnur3h/Pw4sRG5taMfQPNIYskNvWMn6Y=",
+            "Version": "$LATEST",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "9ff61f3e-c818-446a-93d2-9ba9a1a784f1",
+            "PackageType": "Zip",
+            "Architectures": [
+                "x86_64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            },
+            "SnapStart": {
+                "ApplyOn": "None",
+                "OptimizationStatus": "Off"
+            }
+        }
+    ]
+}
