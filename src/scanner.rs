@@ -17,7 +17,7 @@ impl<'a> Scanner<'a> {
             errors: Vec::new(),
             start: 0,
             current: 0,
-            pos: Pos { line: 1, col: 1 },
+            pos: Pos { line: 1, col: 0 },
         }
     }
 
@@ -51,7 +51,7 @@ impl<'a> Scanner<'a> {
             ' ' | '\t' => {}
             '\n' | '\r' => {
                 self.pos.line += 1;
-                self.pos.col = 1;
+                self.pos.col = 0;
             }
             '"' => self.string(),
             '-' | '0'..='9' => self.number(),
