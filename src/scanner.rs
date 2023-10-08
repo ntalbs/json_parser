@@ -42,24 +42,12 @@ impl<'a> Scanner<'a> {
             Some(c) => c,
         };
         match c {
-            '{' => self.add_token(Token::LeftBrace {
-                pos: self.pos,
-            }),
-            '}' => self.add_token(Token::RightBrace {
-                pos: self.pos,
-            }),
-            '[' => self.add_token(Token::LeftBracket {
-                pos: self.pos,
-            }),
-            ']' => self.add_token(Token::RightBracket {
-                pos: self.pos,
-            }),
-            ':' => self.add_token(Token::Colon {
-                pos: self.pos,
-            }),
-            ',' => self.add_token(Token::Comma {
-                pos: self.pos,
-            }),
+            '{' => self.add_token(Token::LeftBrace(self.pos)),
+            '}' => self.add_token(Token::RightBrace(self.pos)),
+            '[' => self.add_token(Token::LeftBracket(self.pos)),
+            ']' => self.add_token(Token::RightBracket(self.pos)),
+            ':' => self.add_token(Token::Colon(self.pos)),
+            ',' => self.add_token(Token::Comma(self.pos)),
             ' ' | '\t' => {}
             '\n' | '\r' => {
                 self.pos.line += 1;

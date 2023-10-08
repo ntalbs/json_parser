@@ -4,24 +4,12 @@ use crate::Pos;
 
 #[derive(Debug, PartialEq)]
 pub(crate) enum Token<'a> {
-    LeftBrace {
-        pos: Pos,
-    },
-    RightBrace {
-        pos: Pos,
-    },
-    LeftBracket {
-        pos: Pos,
-    },
-    RightBracket {
-        pos: Pos,
-    },
-    Colon {
-        pos: Pos,
-    },
-    Comma {
-        pos: Pos,
-    },
+    LeftBrace(Pos),
+    RightBrace(Pos),
+    LeftBracket(Pos),
+    RightBracket(Pos),
+    Colon(Pos),
+    Comma(Pos),
     String {
         lexeme: &'a str,
         val: &'a str,
@@ -46,17 +34,17 @@ pub(crate) enum Token<'a> {
 
 impl<'a> Token<'a> {
     pub(crate) fn pos(&self) -> Pos {
-        match self {
-            Self::LeftBrace { pos, .. } => *pos,
-            Self::RightBrace { pos, .. } => *pos,
-            Self::LeftBracket { pos, .. } => *pos,
-            Self::RightBracket { pos, .. } => *pos,
-            Self::Colon { pos, .. } => *pos,
-            Self::Comma { pos, .. } => *pos,
-            Self::String { pos, .. } => *pos,
-            Self::Number { pos, .. } => *pos,
-            Self::Bool { pos, .. } => *pos,
-            Self::Null { pos, .. } => *pos,
+        match *self {
+            Self::LeftBrace(pos) => pos,
+            Self::RightBrace(pos) => pos,
+            Self::LeftBracket(pos) => pos,
+            Self::RightBracket(pos) => pos,
+            Self::Colon(pos) => pos,
+            Self::Comma(pos) => pos,
+            Self::String { pos, .. } => pos,
+            Self::Number { pos, .. } => pos,
+            Self::Bool { pos, .. } => pos,
+            Self::Null { pos, .. } => pos,
             _ => panic!("EOF doesn't have pos!"),
         }
     }
