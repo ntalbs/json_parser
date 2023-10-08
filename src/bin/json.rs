@@ -16,6 +16,7 @@ fn main() {
             {"a": 10},
             {"a": 20}
         ],
+        "g": null,
         "array_empty": [],
         "array_one": ["hello"],
         "object_empty": {},

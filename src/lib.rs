@@ -1,7 +1,9 @@
+mod color;
 mod parser;
 mod scanner;
 mod token;
 
+use crate::color::Color;
 use std::{fmt::Display, str::FromStr, collections::HashMap};
 
 use parser::Parser;
@@ -104,10 +106,10 @@ impl Display for Json {
                 [h, tail @ ..] => {
                     f.write_fmt(format_args!("{indent_first}{{\n"))?;
                     let (k, v) = h;
-                    f.write_fmt(format_args!("{indent_body}\"{k}\": "))?;
+                    f.write_fmt(format_args!("{indent_body}\"{}\": ", k.bright_green()))?;
                     fmt_level(f, v, level + 1, true)?;
                     for (k, v) in tail {
-                        f.write_fmt(format_args!(",\n{indent_body}\"{k}\": "))?;
+                        f.write_fmt(format_args!(",\n{indent_body}\"{}\": ", k.bright_green()))?;
                         fmt_level(f, v, level + 1, true)?;
                     }
                     f.write_fmt(format_args!("\n{indent_last}}}"))
@@ -147,10 +149,10 @@ impl Display for Json {
             let indent_first = indent_first(level, is_under_key);
 
             match json {
-                Json::Null => f.write_fmt(format_args!("{indent_first}null")),
-                Json::Bool(v) => f.write_fmt(format_args!("{indent_first}{v}")),
-                Json::Num(v) => f.write_fmt(format_args!("{indent_first}{v}")),
-                Json::Str(v) => f.write_fmt(format_args!("{indent_first}\"{v}\"")),
+                Json::Null => f.write_fmt(format_args!("{indent_first}{}", "null".bright_yellow())),
+                Json::Bool(v) => f.write_fmt(format_args!("{indent_first}{}", v.to_string().bright_cyan())),
+                Json::Num(v) => f.write_fmt(format_args!("{indent_first}{}", v.to_string().bright_magenta())),
+                Json::Str(v) => f.write_fmt(format_args!("{indent_first}\"{}\"", v.bright_blue())),
                 Json::Obj(m) => fmt_object(f, m, level, is_under_key),
                 Json::Arr(arr) => fmt_array(f, arr, level, is_under_key),
             }
