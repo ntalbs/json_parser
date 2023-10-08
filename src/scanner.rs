@@ -43,27 +43,21 @@ impl<'a> Scanner<'a> {
         };
         match c {
             '{' => self.add_token(Token::LeftBrace {
-                lexeme: "{",
                 pos: self.pos,
             }),
             '}' => self.add_token(Token::RightBrace {
-                lexeme: "}",
                 pos: self.pos,
             }),
             '[' => self.add_token(Token::LeftBracket {
-                lexeme: "[",
                 pos: self.pos,
             }),
             ']' => self.add_token(Token::RightBracket {
-                lexeme: "]",
                 pos: self.pos,
             }),
             ':' => self.add_token(Token::Colon {
-                lexeme: ":",
                 pos: self.pos,
             }),
             ',' => self.add_token(Token::Comma {
-                lexeme: ",",
                 pos: self.pos,
             }),
             ' ' | '\t' => {}

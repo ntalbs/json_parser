@@ -5,27 +5,21 @@ use crate::Pos;
 #[derive(Debug, PartialEq)]
 pub(crate) enum Token<'a> {
     LeftBrace {
-        lexeme: &'a str,
         pos: Pos,
     },
     RightBrace {
-        lexeme: &'a str,
         pos: Pos,
     },
     LeftBracket {
-        lexeme: &'a str,
         pos: Pos,
     },
     RightBracket {
-        lexeme: &'a str,
         pos: Pos,
     },
     Colon {
-        lexeme: &'a str,
         pos: Pos,
     },
     Comma {
-        lexeme: &'a str,
         pos: Pos,
     },
     String {
@@ -66,17 +60,35 @@ impl<'a> Token<'a> {
             _ => panic!("EOF doesn't have pos!"),
         }
     }
+
+    pub(crate) fn lexeme(&self) -> &'a str {
+        match *self {
+            Self::LeftBrace { .. } => "{",
+            Self::RightBrace { .. } => "}",
+            Self::LeftBracket { .. } => "[",
+            Self::RightBracket { .. } => "]",
+            Self::Colon { .. } => ":",
+            Self::Comma { .. } => ",",
+            Self::String { lexeme, .. } => lexeme,
+            Self::Number { lexeme, .. } => lexeme,
+            Self::Bool { lexeme, .. } => lexeme,
+            Self::Null { lexeme, .. } => lexeme,
+            _ => panic!("EOF doesn't have pos!"),
+        }
+    }
 }
 
 impl<'a> Display for Token<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::LeftBrace { lexeme, pos }
-            | Self::RightBrace { lexeme, pos }
-            | Self::LeftBracket { lexeme, pos }
-            | Self::RightBracket { lexeme, pos }
-            | Self::Colon { lexeme, pos }
-            | Self::Comma { lexeme, pos } => f.write_fmt(format_args!("'{lexeme}' at {pos}")),
+            Self::LeftBrace { .. }
+            | Self::RightBrace { .. }
+            | Self::LeftBracket { .. }
+            | Self::RightBracket { .. }
+            | Self::Colon { .. }
+            | Self::Comma { .. } => {
+                f.write_fmt(format_args!("'{}' at {}", self.lexeme(), self.pos()))
+            }
             Self::String { lexeme, pos, val } => {
                 f.write_fmt(format_args!("'{lexeme}' => \"{val}\" at {pos}"))
             }
