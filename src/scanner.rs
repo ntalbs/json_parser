@@ -120,9 +120,17 @@ impl<'a> Scanner<'a> {
     }
 
     fn string(&mut self) {
+        let mut escape = false;
         loop {
             match self.peek() {
-                Some('"') => break,
+                Some('\\') => escape = true,
+                Some('"') => {
+                    if !escape {
+                        break;
+                    } else {
+                        escape = false;
+                    }
+                }
                 Some('\n') | None => {
                     self.add_error("Unterminated string".to_string());
                     break;
