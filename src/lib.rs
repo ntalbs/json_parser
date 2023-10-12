@@ -4,7 +4,7 @@ mod scanner;
 mod token;
 
 use crate::color::Color;
-use std::{fmt::Display, str::FromStr, collections::HashMap};
+use std::{collections::HashMap, fmt::Display, str::FromStr};
 
 use parser::Parser;
 use scanner::Scanner;
@@ -150,8 +150,14 @@ impl Display for Json {
 
             match json {
                 Json::Null => f.write_fmt(format_args!("{indent_first}{}", "null".bright_yellow())),
-                Json::Bool(v) => f.write_fmt(format_args!("{indent_first}{}", v.to_string().bright_cyan())),
-                Json::Num(v) => f.write_fmt(format_args!("{indent_first}{}", v.to_string().bright_magenta())),
+                Json::Bool(v) => f.write_fmt(format_args!(
+                    "{indent_first}{}",
+                    v.to_string().bright_cyan()
+                )),
+                Json::Num(v) => f.write_fmt(format_args!(
+                    "{indent_first}{}",
+                    v.to_string().bright_magenta()
+                )),
                 Json::Str(v) => f.write_fmt(format_args!("{indent_first}\"{}\"", v.bright_blue())),
                 Json::Obj(m) => fmt_object(f, m, level, is_under_key),
                 Json::Arr(arr) => fmt_array(f, arr, level, is_under_key),
