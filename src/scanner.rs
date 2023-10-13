@@ -151,11 +151,6 @@ impl<'a> Scanner<'a> {
     }
 
     fn number(&mut self) {
-        // unwrap() is safe here as this envoked when the char is digit or '-'
-        if self.peek().unwrap() == '-' {
-            self.advance();
-        }
-
         self.digits();
 
         if let (Some('.'), Some(c)) = (self.peek(), self.peek_next()) {
