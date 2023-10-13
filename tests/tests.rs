@@ -16,6 +16,19 @@ fn test_json_literals() {
 }
 
 #[test]
+fn test_invalid() {
+    match Json::from_str("123.x") {
+        Ok(_) => { 
+            // ignore
+        }
+        Err(e) => {
+            assert!(e.len() == 1);
+            assert!(e[0].message.contains("Unexpected token") );
+        }
+    }
+}
+
+#[test]
 fn test_json_empty() {
     let json = Json::from_str("{}").unwrap();
     assert_eq!(json, Json::Obj(vec![]));

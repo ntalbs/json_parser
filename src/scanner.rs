@@ -111,14 +111,6 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    fn peek_next(&self) -> Option<char> {
-        if self.is_at_end() {
-            None
-        } else {
-            self.source.chars().nth(self.current + 1)
-        }
-    }
-
     fn string(&mut self) {
         let mut escape = false;
         loop {
@@ -153,14 +145,10 @@ impl<'a> Scanner<'a> {
     fn number(&mut self) {
         self.digits();
 
-        if let (Some('.'), Some(c)) = (self.peek(), self.peek_next()) {
-            if self.is_digit(c) {
-                self.advance();
-                self.advance();
-            }
+        if let Some('.') = self.peek() {
+            self.advance();
+            self.digits();
         }
-
-        self.digits();
 
         let lexeme = &self.source[self.start..self.current];
         let val = lexeme.parse::<f64>().unwrap();
