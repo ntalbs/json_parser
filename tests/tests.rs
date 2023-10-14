@@ -11,8 +11,8 @@ fn test_json_literals() {
     assert_eq!(json, Json::Bool(false));
     let json = Json::from_str("123.45").unwrap();
     assert_eq!(json, Json::Num(123.45));
-    let json = Json::from_str("\"abc\"").unwrap();
-    assert_eq!(json, Json::Str("abc".to_string()));
+    let json = Json::from_str("\"a\\\"bc\"").unwrap();
+    assert_eq!(json, Json::Str("a\\\"bc".to_string()));
 }
 
 #[test]
