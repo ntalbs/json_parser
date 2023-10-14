@@ -1,7 +1,10 @@
+use std::{iter::Peekable, str::Chars};
+
 use crate::{Error, Pos, Token};
 
 pub(crate) struct Scanner<'a> {
     source: &'a str,
+    iter: Peekable<Chars<'a>>,
     tokens: Vec<Token<'a>>,
     errors: Vec<Error>,
     start: usize,
@@ -13,6 +16,7 @@ impl<'a> Scanner<'a> {
     pub(crate) fn new(input: &'a str) -> Self {
         Scanner {
             source: input,
+            iter: input.chars().peekable(),
             tokens: Vec::new(),
             errors: Vec::new(),
             start: 0,
@@ -94,32 +98,35 @@ impl<'a> Scanner<'a> {
     }
 
     fn advance(&mut self) -> Option<char> {
-        if self.is_at_end() {
-            None
-        } else {
-            self.pos.col += 1;
-            self.current += 1;
-            Some(self.source.chars().nth(self.current - 1).unwrap())
+        match self.iter.next() {
+            Some(c) => {
+                self.pos.col += 1;
+                self.current += 1;
+                Some(c)
+            }
+            None => None
         }
     }
 
-    fn peek(&self) -> Option<char> {
-        if self.is_at_end() {
-            None
-        } else {
-            self.source.chars().nth(self.current)
-        }
+    fn peek(&mut self) -> Option<&char> {
+        self.iter.peek()
     }
 
     fn string(&mut self) {
         let mut escape = false;
         loop {
-            match self.peek() {
+            let c = self.peek();
+            match c {
                 Some('\\') => escape = true,
                 Some('"') => {
                     if !escape {
                         break;
                     } else {
+                        escape = false;
+                    }
+                }
+                Some('n') | Some('t') => {
+                    if escape {
                         escape = false;
                     }
                 }
@@ -160,7 +167,7 @@ impl<'a> Scanner<'a> {
     }
 
     fn digits(&mut self) {
-        while let Some(c) = self.peek() {
+        while let Some(&c) = self.peek() {
             if self.is_digit(c) {
                 self.advance();
             } else {
@@ -170,7 +177,7 @@ impl<'a> Scanner<'a> {
     }
 
     fn keyword(&mut self) {
-        while let Some(c) = self.peek() {
+        while let Some(&c) = self.peek() {
             if self.is_alnum(c) {
                 self.advance();
             } else {
