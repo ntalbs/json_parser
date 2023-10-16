@@ -16,14 +16,21 @@ fn test_json_literals() {
 }
 
 #[test]
-fn test_invalid() {
-    match Json::from_str("123.x") {
-        Ok(_) => { 
-            // ignore
-        }
-        Err(e) => {
-            assert!(e.len() == 1);
-            assert!(e[0].message.contains("Unexpected token") );
+fn test_json_invalid_literals() {
+    let invalid_literals = vec![
+        ("123.x",  "Unexpected token"),
+        ("truefalse", "Unexpected token"),
+        ("\"hello", "Unterminated string"),        
+    ];
+    for (json, err_mesg) in invalid_literals {
+        match Json::from_str(json) {
+            Ok(_) => {
+                // ignore
+            }
+            Err(e) => {
+                assert!(e.len() == 1);
+                assert!(e[0].message.contains(err_mesg) );
+            }
         }
     }
 }
