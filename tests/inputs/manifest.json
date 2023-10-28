@@ -1,0 +1,210 @@
+{
+  "version": "20.0.0",
+  "artifacts": {
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    },
+    "TweetbookStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "TweetbookStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "TweetbookStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "TweetbookStack.template.json",
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c2133b28e267f37606728c0997238c5e9c258c4431115d88d0378cee8965ecf6.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "TweetbookStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "TweetbookStack.assets"
+      ],
+      "metadata": {
+        "/TweetbookStack/Tweetbook-Quotes": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "TweetbookQuotes8E1940BE"
+            }
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Quotes/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookQuotes8E1940BE"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Tweet/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookTweetServiceRole0E634880"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Tweet/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookTweetServiceRoleDefaultPolicyBFB92B80"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Tweet/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookTweet1B371253"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-EveryDayAt6am/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookEveryDayAt6am149123DB"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-EveryDayAt6am/AllowEventRuleTweetbookStackTweetbookTweet2541CEEE": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookEveryDayAt6amAllowEventRuleTweetbookStackTweetbookTweet2541CEEEA31878DB"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Bucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookBucketEBD8CA35"
+          }
+        ],
+        "/TweetbookStack/DeployHtml/AwsCliLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeployHtmlAwsCliLayer9F9F2C78"
+          }
+        ],
+        "/TweetbookStack/DeployHtml/CustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeployHtmlCustomResource0856D8C5"
+          }
+        ],
+        "/TweetbookStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+          }
+        ],
+        "/TweetbookStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF"
+          }
+        ],
+        "/TweetbookStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-apigw-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Tweetbookapigwrole1DB312BE"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-apigw-role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookapigwroleDefaultPolicy986E35D6"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Web/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookWeb193D42BB"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Web/CloudWatchRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookWebCloudWatchRoleB68A55F1"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Web/Account": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookWebAccount70C77AB7"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Web/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookWebDeploymentC58F3886fa0bb58bb94c92eee8508b876b94c2cb"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Web/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookWebDeploymentStageprod37DE5A3A"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Web/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookWebEndpoint2A5CEBA8"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Web/Default/{file}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookWebfileA9B18280"
+          }
+        ],
+        "/TweetbookStack/Tweetbook-Web/Default/{file}/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TweetbookWebfileGET266A020E"
+          }
+        ],
+        "/TweetbookStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/TweetbookStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/TweetbookStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/TweetbookStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "TweetbookStack"
+    }
+  }
+}

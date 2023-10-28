@@ -1,0 +1,923 @@
+{
+ "Resources": {
+  "TweetbookQuotes8E1940BE": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "N"
+     }
+    ],
+    "ProvisionedThroughput": {
+     "ReadCapacityUnits": 5,
+     "WriteCapacityUnits": 5
+    },
+    "TableName": "Tweetbook-Quotes"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-Quotes/Resource"
+   }
+  },
+  "TweetbookTweetServiceRole0E634880": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-Tweet/ServiceRole/Resource"
+   }
+  },
+  "TweetbookTweetServiceRoleDefaultPolicyBFB92B80": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:secretsmanager:eu-west-1:864661773271:secret:TwitterBookBotApiTokens-1TlZIp"
+      },
+      {
+       "Action": "dynamodb:GetItem",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "TweetbookQuotes8E1940BE",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "TweetbookTweetServiceRoleDefaultPolicyBFB92B80",
+    "Roles": [
+     {
+      "Ref": "TweetbookTweetServiceRole0E634880"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-Tweet/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "TweetbookTweet1B371253": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "9f8c386ff7ed2002f200d0e53ade706f7b37aa86042633403fb6b47823f8d475.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "TweetbookTweetServiceRole0E634880",
+      "Arn"
+     ]
+    },
+    "FunctionName": "Tweetbook-Tweet",
+    "Handler": "index.handler",
+    "Runtime": "nodejs16.x"
+   },
+   "DependsOn": [
+    "TweetbookTweetServiceRoleDefaultPolicyBFB92B80",
+    "TweetbookTweetServiceRole0E634880"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-Tweet/Resource",
+    "aws:asset:path": "asset.9f8c386ff7ed2002f200d0e53ade706f7b37aa86042633403fb6b47823f8d475",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "TweetbookEveryDayAt6am149123DB": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Trigger everyday at 6am",
+    "Name": "Tweetbook-EveryDayAt6am",
+    "ScheduleExpression": "cron(0 6 * * ? *)",
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "TweetbookTweet1B371253",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-EveryDayAt6am/Resource"
+   }
+  },
+  "TweetbookEveryDayAt6amAllowEventRuleTweetbookStackTweetbookTweet2541CEEEA31878DB": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "TweetbookTweet1B371253",
+      "Arn"
+     ]
+    },
+    "Principal": "events.amazonaws.com",
+    "SourceArn": {
+     "Fn::GetAtt": [
+      "TweetbookEveryDayAt6am149123DB",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-EveryDayAt6am/AllowEventRuleTweetbookStackTweetbookTweet2541CEEE"
+   }
+  },
+  "TweetbookBucketEBD8CA35": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketName": "a-tweetbook-bucket",
+    "Tags": [
+     {
+      "Key": "aws-cdk:cr-owned:1e5e0c0a",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-Bucket/Resource"
+   }
+  },
+  "DeployHtmlAwsCliLayer9F9F2C78": {
+   "Type": "AWS::Lambda::LayerVersion",
+   "Properties": {
+    "Content": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "8ad7bbf8be94e05d569da95ddb82511dcc959f25054825394cbb86028ccd1b6a.zip"
+    },
+    "Description": "/opt/awscli/aws"
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/DeployHtml/AwsCliLayer/Resource",
+    "aws:asset:path": "asset.8ad7bbf8be94e05d569da95ddb82511dcc959f25054825394cbb86028ccd1b6a.zip",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Content"
+   }
+  },
+  "DeployHtmlCustomResource0856D8C5": {
+   "Type": "Custom::CDKBucketDeployment",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536",
+      "Arn"
+     ]
+    },
+    "SourceBucketNames": [
+     {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     }
+    ],
+    "SourceObjectKeys": [
+     "39b57ad9eeae8c149921a112c80ffcfa964052ae5fb02d8c75cf4e82fe526662.zip"
+    ],
+    "DestinationBucketName": {
+     "Ref": "TweetbookBucketEBD8CA35"
+    },
+    "Prune": true
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/DeployHtml/CustomResource/Default"
+   }
+  },
+  "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource"
+   }
+  },
+  "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":s3:::",
+           {
+            "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":s3:::",
+           {
+            "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
+        "s3:Abort*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "TweetbookBucketEBD8CA35",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "TweetbookBucketEBD8CA35",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
+    "Roles": [
+     {
+      "Ref": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "f98b78092dcdd31f5e6d47489beb5f804d4835ef86a8085d0a2053cb9ae711da.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265",
+      "Arn"
+     ]
+    },
+    "Handler": "index.handler",
+    "Layers": [
+     {
+      "Ref": "DeployHtmlAwsCliLayer9F9F2C78"
+     }
+    ],
+    "Runtime": "python3.7",
+    "Timeout": 900
+   },
+   "DependsOn": [
+    "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
+    "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource",
+    "aws:asset:path": "asset.f98b78092dcdd31f5e6d47489beb5f804d4835ef86a8085d0a2053cb9ae711da",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "Tweetbookapigwrole1DB312BE": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "RoleName": "Tweetbook-ApiGw-S3-ReadOnly"
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-apigw-role/Resource"
+   }
+  },
+  "TweetbookapigwroleDefaultPolicy986E35D6": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:GetObject",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "TweetbookBucketEBD8CA35",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "TweetbookapigwroleDefaultPolicy986E35D6",
+    "Roles": [
+     {
+      "Ref": "Tweetbookapigwrole1DB312BE"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-apigw-role/DefaultPolicy/Resource"
+   }
+  },
+  "TweetbookWeb193D42BB": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Name": "Tweetbook-Web"
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-Web/Resource"
+   }
+  },
+  "TweetbookWebCloudWatchRoleB68A55F1": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-Web/CloudWatchRole/Resource"
+   }
+  },
+  "TweetbookWebAccount70C77AB7": {
+   "Type": "AWS::ApiGateway::Account",
+   "Properties": {
+    "CloudWatchRoleArn": {
+     "Fn::GetAtt": [
+      "TweetbookWebCloudWatchRoleB68A55F1",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "TweetbookWeb193D42BB"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-Web/Account"
+   }
+  },
+  "TweetbookWebDeploymentC58F3886fa0bb58bb94c92eee8508b876b94c2cb": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "RestApiId": {
+     "Ref": "TweetbookWeb193D42BB"
+    },
+    "Description": "Automatically created by the RestApi construct"
+   },
+   "DependsOn": [
+    "TweetbookWebfileGET266A020E",
+    "TweetbookWebfileA9B18280"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-Web/Deployment/Resource"
+   }
+  },
+  "TweetbookWebDeploymentStageprod37DE5A3A": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "RestApiId": {
+     "Ref": "TweetbookWeb193D42BB"
+    },
+    "DeploymentId": {
+     "Ref": "TweetbookWebDeploymentC58F3886fa0bb58bb94c92eee8508b876b94c2cb"
+    },
+    "StageName": "prod"
+   },
+   "DependsOn": [
+    "TweetbookWebAccount70C77AB7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-Web/DeploymentStage.prod/Resource"
+   }
+  },
+  "TweetbookWebfileA9B18280": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "TweetbookWeb193D42BB",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "{file}",
+    "RestApiId": {
+     "Ref": "TweetbookWeb193D42BB"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-Web/Default/{file}/Resource"
+   }
+  },
+  "TweetbookWebfileGET266A020E": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "HttpMethod": "GET",
+    "ResourceId": {
+     "Ref": "TweetbookWebfileA9B18280"
+    },
+    "RestApiId": {
+     "Ref": "TweetbookWeb193D42BB"
+    },
+    "AuthorizationType": "NONE",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "Tweetbookapigwrole1DB312BE",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "GET",
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Content-Type": "integration.response.header.Content-Type"
+       },
+       "SelectionPattern": "2..",
+       "StatusCode": "200"
+      },
+      {
+       "SelectionPattern": "4..",
+       "StatusCode": "403"
+      }
+     ],
+     "RequestParameters": {
+      "integration.request.path.file": "method.request.path.file"
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":s3:path/",
+        {
+         "Ref": "TweetbookBucketEBD8CA35"
+        },
+        "/{file}"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Content-Type": true
+      },
+      "StatusCode": "200"
+     },
+     {
+      "StatusCode": "404"
+     }
+    ],
+    "RequestParameters": {
+     "method.request.path.file": true
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/Tweetbook-Web/Default/{file}/GET/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/22Ry07DMBBFv6V719CCENs0iBWIqkVsI9cewrR+RBm7VRTl3/GjtF2wmjOP3PHcLPnyid/PxInmUh3mGnd83HohD2wD5EIvgcVeM6rBCuNU7H6KnQZWf9sME9PC7JTg42uw0qOzqXXLa+gNEp2zNzFA/wV9zrdoWw3eXeYnhsLwcePKhhzXTqMcslKmidFDMwoi8MSrFJiCTrvBgPV8FeQB/MulkKb5WKorQcAKJrlCE4NjnKO4NZy3hnSW6LAVHk5iiB0gX3WYm1espHTBenZdlqo3WfSxzYoF/gzNz7i4WzQLv4P/cSqVCk0Tywem76NVZ6sbnTxs4m+RGnl1olpjtpXVgbwz/0pH/gi+C/mNtbMKi9/WKeB7ujsunvnikS9ne0Kc9/EuNMA3Jf4CrSCaUSUCAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "TweetbookStack/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Outputs": {
+  "TweetbookWebEndpoint2A5CEBA8": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "TweetbookWeb193D42BB"
+      },
+      ".execute-api.",
+      {
+       "Ref": "AWS::Region"
+      },
+      ".",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "TweetbookWebDeploymentStageprod37DE5A3A"
+      },
+      "/"
+     ]
+    ]
+   }
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-2"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
