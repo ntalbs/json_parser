@@ -18,9 +18,9 @@ fn test_json_literals() {
 #[test]
 fn test_json_invalid_literals() {
     let invalid_literals = vec![
-        ("123.x",  "Unexpected token"),
+        ("123.x", "Unexpected token"),
         ("truefalse", "Unexpected token"),
-        ("\"hello", "Unterminated string"),        
+        ("\"hello", "Unterminated string"),
     ];
     for (json, err_mesg) in invalid_literals {
         match Json::from_str(json) {
@@ -29,7 +29,7 @@ fn test_json_invalid_literals() {
             }
             Err(e) => {
                 assert!(e.len() == 1);
-                assert!(e[0].message.contains(err_mesg) );
+                assert!(e[0].message.contains(err_mesg));
             }
         }
     }

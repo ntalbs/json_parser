@@ -104,7 +104,7 @@ impl<'a> Scanner<'a> {
                 self.current += 1;
                 Some(c)
             }
-            None => None
+            None => None,
         }
     }
 
