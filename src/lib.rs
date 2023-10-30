@@ -52,9 +52,8 @@ impl FromStr for Json {
             Ok(tokens) => {
                 println!(">>> Tokens:");
                 for t in tokens {
-                    match t {
-                        Token::Eof => break,
-                        _ => {}
+                    if t == &Token::Eof {
+                        break;
                     }
                     let line = line_map.get(&t.pos().line).unwrap();
                     let col = t.pos().col;
