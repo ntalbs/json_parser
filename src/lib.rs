@@ -1,9 +1,8 @@
-mod color;
 mod parser;
 mod scanner;
 mod token;
 
-use crate::color::Color;
+use colorust::Color;
 use std::{collections::HashMap, fmt::Display, str::FromStr};
 
 use parser::Parser;

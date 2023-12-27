@@ -3,3 +3,6 @@ name = "json_parser"
 version = "0.1.0"
 edition = "2021"
 authors = ["ntalbs <ntalbs@gmail.com>"]
+
+[dependencies]
+colorust = { git = "https://github.com/ntalbs/colorust.git" }
