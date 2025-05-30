@@ -121,10 +121,7 @@ impl<'a> Parser<'a> {
         };
 
         let val = match self.advance() {
-            Colon { .. } => match self.json() {
-                Ok(val) => val,
-                Err(e) => return Err(e),
-            },
+            Colon { .. } => self.json()?,
             _ => {
                 return Err(Error {
                     message: "Invalid token: expected ':'".to_string(),
