@@ -49,18 +49,18 @@ impl FromStr for Json {
         let mut scanner = Scanner::new(s);
         let tokens = match scanner.scan_tokens() {
             Ok(tokens) => {
-                println!(">>> Tokens:");
-                for t in tokens {
-                    if t == &Token::Eof {
-                        break;
-                    }
-                    let line = line_map.get(&t.pos().line).unwrap();
-                    let col = t.pos().col;
-                    println!("{t}");
-                    println!("{:>6} | {}", t.pos().line, line);
-                    println!("        {}^", " ".repeat(col));
-                }
-                println!(">>>");
+                // println!(">>> Tokens:");
+                // for t in tokens {
+                //     if t == &Token::Eof {
+                //         break;
+                //     }
+                //     let line = line_map.get(&t.pos().line).unwrap();
+                //     let col = t.pos().col;
+                //     println!("{t}");
+                //     println!("{:>6} | {}", t.pos().line, line);
+                //     println!("        {}^", " ".repeat(col));
+                // }
+                // println!(">>>");
                 tokens
             }
             Err(errors) => return Err(errors.to_vec()),
