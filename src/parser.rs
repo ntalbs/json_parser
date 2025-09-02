@@ -149,7 +149,7 @@ impl<'a> Parser<'a> {
         Json::Null
     }
 
-    fn advance(&mut self) -> &Token {
+    fn advance(&mut self) -> &Token<'_> {
         if !self.is_at_end() {
             self.current += 1;
         }
@@ -160,11 +160,11 @@ impl<'a> Parser<'a> {
         *self.peek() == Token::Eof
     }
 
-    fn peek(&self) -> &Token {
+    fn peek(&self) -> &Token<'_> {
         &self.tokens[self.current]
     }
 
-    fn previous(&self) -> &Token {
+    fn previous(&self) -> &Token<'_> {
         &self.tokens[self.current - 1]
     }
 }

@@ -25,7 +25,7 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    pub(crate) fn scan_tokens(&mut self) -> Result<&[Token], &[Error]> {
+    pub(crate) fn scan_tokens(&mut self) -> Result<&[Token<'_>], &[Error]> {
         while !self.is_at_end() {
             self.start = self.current;
             self.scan_token();
