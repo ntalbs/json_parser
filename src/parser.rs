@@ -126,7 +126,7 @@ impl<'a> Parser<'a> {
                 return Err(Error {
                     message: "Invalid token: expected ':'".to_string(),
                     pos: self.peek().pos(),
-                })
+                });
             }
         };
 
