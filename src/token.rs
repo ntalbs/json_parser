@@ -29,7 +29,7 @@ pub(crate) enum Token<'a> {
         lexeme: &'a str,
         pos: Pos,
     },
-    Eof,
+    Eof(Pos),
 }
 
 impl<'a> Token<'a> {
@@ -45,7 +45,7 @@ impl<'a> Token<'a> {
             Self::Number { pos, .. } => pos,
             Self::Bool { pos, .. } => pos,
             Self::Null { pos, .. } => pos,
-            _ => panic!("EOF doesn't have pos!"),
+            Self::Eof(pos) => pos,
         }
     }
 
@@ -87,7 +87,7 @@ impl Display for Token<'_> {
                 f.write_fmt(format_args!("'{lexeme}' => {val} at {pos}"))
             }
             Self::Null { lexeme, pos } => f.write_fmt(format_args!("'{lexeme}' => null at {pos}")),
-            Self::Eof => f.write_str("EOF"),
+            Self::Eof(_) => f.write_str("EOF"),
         }
     }
 }

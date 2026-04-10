@@ -157,7 +157,7 @@ impl<'a> Parser<'a> {
     }
 
     fn is_at_end(&self) -> bool {
-        *self.peek() == Token::Eof
+        matches!(*self.peek(), Token::Eof(_))
     }
 
     fn peek(&self) -> &Token<'_> {

@@ -30,7 +30,7 @@ impl<'a> Scanner<'a> {
             self.start = self.current;
             self.scan_token();
         }
-        self.add_token(Token::Eof);
+        self.add_token(Token::Eof(self.pos));
 
         if self.errors.is_empty() {
             Ok(&self.tokens)

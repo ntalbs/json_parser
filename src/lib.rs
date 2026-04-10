@@ -200,4 +200,15 @@ mod test {
 
         assert_eq!(input, String::from_utf8(strip(json.to_string())).unwrap())
     }
+
+    #[test]
+    fn test_json_err() {
+        let input = indoc!(r#"
+            {
+                "a": 10,
+                "b": 20,
+            }
+        "#); // additional comma
+        assert!(matches!(Json::from_str(input), Err(_)));
+    }
 }
