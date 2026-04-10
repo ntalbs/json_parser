@@ -48,21 +48,7 @@ impl FromStr for Json {
 
         let mut scanner = Scanner::new(s);
         let tokens = match scanner.scan_tokens() {
-            Ok(tokens) => {
-                // println!(">>> Tokens:");
-                // for t in tokens {
-                //     if t == &Token::Eof {
-                //         break;
-                //     }
-                //     let line = line_map.get(&t.pos().line).unwrap();
-                //     let col = t.pos().col;
-                //     println!("{t}");
-                //     println!("{:>6} | {}", t.pos().line, line);
-                //     println!("        {}^", " ".repeat(col));
-                // }
-                // println!(">>>");
-                tokens
-            }
+            Ok(tokens) => tokens,
             Err(errors) => return Err(errors.to_vec()),
         };
 
@@ -76,7 +62,7 @@ impl FromStr for Json {
 
 impl Display for Json {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        const TAB: &str = "  ";
+        const TAB: &str = "    ";
         fn indent_first(level: usize, is_under_key: bool) -> String {
             TAB.repeat(if is_under_key { 0 } else { level })
         }
@@ -163,5 +149,55 @@ impl Display for Json {
         }
 
         fmt_level(f, self, 0, false)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use indoc::indoc;
+    use p_test::p_test;
+    use strip_ansi_escapes::strip;
+
+    use std::str::FromStr;
+    use crate::{Json, Pos};
+
+    #[test]
+    fn test_pos_display() {
+        let pos = Pos {
+            line: 5,
+            col: 30
+        };
+
+        assert_eq!("5:30", pos.to_string());
+    }
+
+    #[p_test(
+        empty_obj, ("{}"),
+        empty_arr, ("[]"),
+        null, ("null"),
+        boolean_true, ("true"),
+        boolean_false, ("false"),
+        number, ("100"),
+        string, (r#""hello""#),
+
+        arr_short, (indoc!(r#"
+            [
+                1,
+                2,
+                3
+            ]
+        "#)),
+        obj_simple, (indoc!(r#"
+            {
+                "a": 10,
+                "b": 20
+            }
+        "#)),
+    )]
+    fn test_json_display(input: &str) {
+        let input = input.trim();
+        let json = Json::from_str(input).unwrap();
+
+        assert_eq!(input, String::from_utf8(strip(json.to_string())).unwrap())
     }
 }

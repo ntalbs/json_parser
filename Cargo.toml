@@ -6,3 +6,7 @@ edition = "2024"
 [dependencies]
 colorust = { git = "https://github.com/ntalbs/colorust.git" }
 
+[dev-dependencies]
+indoc = "2.0.7"
+p-test = "1.0.2"
+strip-ansi-escapes = "0.2.1"
