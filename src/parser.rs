@@ -86,10 +86,8 @@ impl<'a> Parser<'a> {
         }
 
         loop {
-            match self.json() {
-                Ok(e) => elements.push(e),
-                Err(e) => return Err(e),
-            }
+            let e = self.json()?;
+            elements.push(e);
 
             if !matches!(self.peek(), Comma { .. }) {
                 break;
