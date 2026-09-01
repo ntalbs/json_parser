@@ -158,15 +158,12 @@ mod test {
     use p_test::p_test;
     use strip_ansi_escapes::strip;
 
-    use std::str::FromStr;
     use crate::{Json, Pos};
+    use std::str::FromStr;
 
     #[test]
     fn test_pos_display() {
-        let pos = Pos {
-            line: 5,
-            col: 30
-        };
+        let pos = Pos { line: 5, col: 30 };
 
         assert_eq!("5:30", pos.to_string());
     }
@@ -203,12 +200,14 @@ mod test {
 
     #[test]
     fn test_json_err() {
-        let input = indoc!(r#"
+        let input = indoc!(
+            r#"
             {
                 "a": 10,
                 "b": 20,
             }
-        "#); // additional comma
+        "#
+        ); // additional comma
         assert!(matches!(Json::from_str(input), Err(_)));
     }
 }
