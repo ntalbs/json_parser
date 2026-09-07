@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-colorust = { git = "https://github.com/ntalbs/colorust.git" }
+coloring = { git = "https://github.com/ntalbs/coloring.git" }
 
 [dev-dependencies]
 indoc = "2.0.7"

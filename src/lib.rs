@@ -2,7 +2,7 @@ mod parser;
 mod scanner;
 mod token;
 
-use colorust::Color;
+use coloring::Color;
 use std::{collections::HashMap, fmt::Display, str::FromStr};
 
 use parser::Parser;
